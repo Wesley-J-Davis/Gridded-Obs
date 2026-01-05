@@ -1,0 +1,15 @@
+#
+# GrITAS Resource file.
+#
+#
+#  Vertical levels
+#  ---------------
+ 
+GrITAS*Vertical_Levels:   1000 
+ 
+# User Defined Grid List 
+# ---------------------
+GrITAS*List::
+#  kt   var name                Title                           kx's
+   21    _tco       "omieff_aura : Total Column Ozone        "  449 
+::
