@@ -1,0 +1,12 @@
+Title:MERRA-2 Monthly Gridded Innovations and Observations
+VersionID:1
+Format:NetCDF-4
+ProcessingLevel:4
+IdentifierProductDOIAuthority:https://doi.org
+Conventions:CF-1-8
+Source:NASA Global Modeling and Assimilation Office
+DataSetQuality:These binned observations include parameters for bias and difference from analysis and first-guess.
+Comment:These data represent the observations assimilated during the processing of MERRA-2, which have been binned to the MERRA-2 grid.
+RelatedURL:https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/
+MapProjection:Geographic latitude/longitude
+Datum:WGS-84

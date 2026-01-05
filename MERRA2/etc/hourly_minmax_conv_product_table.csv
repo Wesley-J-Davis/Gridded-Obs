@@ -1,0 +1,210 @@
+tv_raob , 186.0 , 307.0
+qv_raob , 0.0 , 21.0
+u_raob , -52.0 , 101.0
+v_raob , -58.0 , 44.0
+ps_raob , 648.0 , 1032.0
+tv_acraft , 202.0 , 305.0
+qv_acraft , 1.e+15, 1.e+15
+u_acraft , -25.0 , 89.0
+v_acraft , -65.0 , 39.0
+u_prof , -15.0 , 54.0
+v_prof , -54.0 , 34.0
+u_scat , -19.0 , 24.0
+v_scat , -19.0 , 18.0
+w_ssmi , 0.0 , 29.0
+u_amv , -28.0 , 66.0
+v_amv , -53.0 , 52.0
+sst_sea , 1.e+15, 1.e+15
+tv_sea , 257.0 , 307.0
+ps_sea , 975.0 , 1043.0
+u_sea , -17.0 , 27.0
+v_sea , -23.0 , 21.0
+qv_sea , 0.0 , 24.0
+ps_land , 600.0 , 1038.0
+ps_paob , 950.0 , 1033.0
+tv_drift , 236.0 , 303.0
+tv_mls , 1.e+15, 1.e+15
+u_drift , -9.0 , 10.0
+v_drift , -9.0 , 7.0
+ps_drift , 958.0 , 1044.0
+bang_gps , 1.e+15, 1.e+15
+tv_raob_omf , -7.0 , 8.0
+qv_raob_omf , -8.0 , 7.0
+u_raob_omf , -16.0 , 15.0
+v_raob_omf , -14.0 , 14.0
+ps_raob_omf , -4.0 , 4.0
+tv_acraft_omf , -5.0 , 5.0
+qv_acraft_omf , 1.e+15, 1.e+15
+u_acraft_omf , -15.0 , 13.0
+v_acraft_omf , -14.0 , 17.0
+u_prof_omf , -9.0 , 7.0
+v_prof_omf , -11.0 , 8.0
+u_scat_omf , -15.0 , 12.0
+v_scat_omf , -14.0 , 13.0
+w_ssmi_omf , -8.0 , 16.0
+u_amv_omf , -16.0 , 13.0
+v_amv_omf , -13.0 , 14.0
+sst_sea_omf , 1.e+15, 1.e+15
+tv_sea_omf , -7.0 , 7.0
+ps_sea_omf , -6.0 , 6.0
+u_sea_omf , -11.0 , 11.0
+v_sea_omf , -11.0 , 9.0
+qv_sea_omf , -5.0 , 9.0
+ps_land_omf , -6.0 , 4.0
+ps_paob_omf , -3.0 , 6.0
+tv_drift_omf , -10.0 , 8.0
+tv_mls_omf , 1.e+15, 1.e+15
+u_drift_omf , -9.0 , 2.0
+v_drift_omf , -7.0 , 9.0
+ps_drift_omf , -6.0 , 4.0
+bang_gps_omf , 1.e+15, 1.e+15
+tv_raob_oma , -6.0 , 7.0
+qv_raob_oma , -8.0 , 6.0
+u_raob_oma , -14.0 , 12.0
+v_raob_oma , -12.0 , 11.0
+ps_raob_oma , -3.0 , 3.0
+tv_acraft_oma , -5.0 , 5.0
+qv_acraft_oma , 1.e+15, 1.e+15
+u_acraft_oma , -12.0 , 12.0
+v_acraft_oma , -15.0 , 16.0
+u_prof_oma , -8.0 , 8.0
+v_prof_oma , -11.0 , 7.0
+u_scat_oma , -16.0 , 10.0
+v_scat_oma , -11.0 , 11.0
+w_ssmi_oma , -7.0 , 14.0
+u_amv_oma , -13.0 , 11.0
+v_amv_oma , -11.0 , 10.0
+sst_sea_oma , 1.e+15, 1.e+15
+tv_sea_oma , -5.0 , 7.0
+ps_sea_oma , -6.0 , 5.0
+u_sea_oma , -10.0 , 10.0
+v_sea_oma , -10.0 , 9.0
+qv_sea_oma , -5.0 , 9.0
+ps_land_oma , -6.0 , 4.0
+ps_paob_oma , -3.0 , 6.0
+tv_drift_oma , -5.0 , 5.0
+tv_mls_oma , 1.e+15, 1.e+15
+u_drift_oma , -8.0 , 2.0
+v_drift_oma , -7.0 , 10.0
+ps_drift_oma , -5.0 , 4.0
+bang_gps_oma , 1.e+15, 1.e+15
+tv_raob_nobs , 0.0 , 9.0
+qv_raob_nobs , 0.0 , 7.0
+u_raob_nobs , 0.0 , 16.0
+v_raob_nobs , 0.0 , 16.0
+ps_raob_nobs , 0.0 , 1.0
+tv_acraft_nobs , 0.0 , 73.0
+qv_acraft_nobs , 0.0 , 0.0
+u_acraft_nobs , 0.0 , 73.0
+v_acraft_nobs , 0.0 , 73.0
+u_prof_nobs , 0.0 , 47.0
+v_prof_nobs , 0.0 , 47.0
+u_scat_nobs , 0.0 , 10.0
+v_scat_nobs , 0.0 , 10.0
+w_ssmi_nobs , 0.0 , 4.0
+u_amv_nobs , 0.0 , 6.0
+v_amv_nobs , 0.0 , 6.0
+sst_sea_nobs , 0.0 , 0.0
+tv_sea_nobs , 0.0 , 36.0
+ps_sea_nobs , 0.0 , 36.0
+u_sea_nobs , 0.0 , 36.0
+v_sea_nobs , 0.0 , 36.0
+qv_sea_nobs , 0.0 , 18.0
+ps_land_nobs , 0.0 , 57.0
+ps_paob_nobs , 0.0 , 1.0
+tv_drift_nobs , 0.0 , 21.0
+tv_mls_nobs , 0.0 , 0.0
+u_drift_nobs , 0.0 , 12.0
+v_drift_nobs , 0.0 , 12.0
+ps_drift_nobs , 0.0 , 24.0
+bang_gps_nobs , 0.0 , 0.0
+tv_raob_stdv , 0.0 , 7.0
+qv_raob_stdv , 0.0 , 5.0
+u_raob_stdv , 0.0 , 15.0
+v_raob_stdv , 0.0 , 14.0
+ps_raob_stdv , 1.e+15, 1.e+15
+tv_acraft_stdv , 0.0 , 7.0
+qv_acraft_stdv , 1.e+15, 1.e+15
+u_acraft_stdv , 0.0 , 15.0
+v_acraft_stdv , 0.0 , 25.0
+u_prof_stdv , 0.0 , 9.0
+v_prof_stdv , 0.0 , 13.0
+u_scat_stdv , 0.0 , 10.0
+v_scat_stdv , 0.0 , 14.0
+w_ssmi_stdv , 0.0 , 5.0
+u_amv_stdv , 0.0 , 7.0
+v_amv_stdv , 0.0 , 6.0
+sst_sea_stdv , 1.e+15, 1.e+15
+tv_sea_stdv , 0.0 , 3.0
+ps_sea_stdv , 0.0 , 3.0
+u_sea_stdv , 0.0 , 8.0
+v_sea_stdv , 0.0 , 7.0
+qv_sea_stdv , 0.0 , 2.0
+ps_land_stdv , 0.0 , 81.0
+ps_paob_stdv , 1.e+15, 1.e+15
+tv_drift_stdv , 0.0 , 1.0
+tv_mls_stdv , 1.e+15, 1.e+15
+u_drift_stdv , 0.0 , 5.0
+v_drift_stdv , 0.0 , 4.0
+ps_drift_stdv , 0.0 , 8.0
+bang_gps_stdv , 1.e+15, 1.e+15
+tv_raob_stdv_omf , 0.0 , 6.0
+qv_raob_stdv_omf , 0.0 , 5.0
+u_raob_stdv_omf , 0.0 , 13.0
+v_raob_stdv_omf , 0.0 , 15.0
+ps_raob_stdv_omf , 1.e+15, 1.e+15
+tv_acraft_stdv_omf , 0.0 , 4.0
+qv_acraft_stdv_omf , 1.e+15, 1.e+15
+u_acraft_stdv_omf , 0.0 , 14.0
+v_acraft_stdv_omf , 0.0 , 11.0
+u_prof_stdv_omf , 0.0 , 7.0
+v_prof_stdv_omf , 0.0 , 7.0
+u_scat_stdv_omf , 0.0 , 9.0
+v_scat_stdv_omf , 0.0 , 13.0
+w_ssmi_stdv_omf , 0.0 , 4.0
+u_amv_stdv_omf , 0.0 , 6.0
+v_amv_stdv_omf , 0.0 , 7.0
+sst_sea_stdv_omf , 1.e+15, 1.e+15
+tv_sea_stdv_omf , 0.0 , 2.0
+ps_sea_stdv_omf , 0.0 , 2.0
+u_sea_stdv_omf , 0.0 , 8.0
+v_sea_stdv_omf , 0.0 , 7.0
+qv_sea_stdv_omf , 0.0 , 2.0
+ps_land_stdv_omf , 0.0 , 3.0
+ps_paob_stdv_omf , 1.e+15, 1.e+15
+tv_drift_stdv_omf , 0.0 , 1.0
+tv_mls_stdv_omf , 1.e+15, 1.e+15
+u_drift_stdv_omf , 0.0 , 4.0
+v_drift_stdv_omf , 0.0 , 3.0
+ps_drift_stdv_omf , 0.0 , 3.0
+bang_gps_stdv_omf , 1.e+15, 1.e+15
+tv_raob_stdv_oma , 0.0 , 5.0
+qv_raob_stdv_oma , 0.0 , 5.0
+u_raob_stdv_oma , 0.0 , 13.0
+v_raob_stdv_oma , 0.0 , 13.0
+ps_raob_stdv_oma , 1.e+15, 1.e+15
+tv_acraft_stdv_oma , 0.0 , 4.0
+qv_acraft_stdv_oma , 1.e+15, 1.e+15
+u_acraft_stdv_oma , 0.0 , 14.0
+v_acraft_stdv_oma , 0.0 , 10.0
+u_prof_stdv_oma , 0.0 , 7.0
+v_prof_stdv_oma , 0.0 , 7.0
+u_scat_stdv_oma , 0.0 , 9.0
+v_scat_stdv_oma , 0.0 , 13.0
+w_ssmi_stdv_oma , 0.0 , 5.0
+u_amv_stdv_oma , 0.0 , 5.0
+v_amv_stdv_oma , 0.0 , 7.0
+sst_sea_stdv_oma , 1.e+15, 1.e+15
+tv_sea_stdv_oma , 0.0 , 2.0
+ps_sea_stdv_oma , 0.0 , 2.0
+u_sea_stdv_oma , 0.0 , 8.0
+v_sea_stdv_oma , 0.0 , 7.0
+qv_sea_stdv_oma , 0.0 , 2.0
+ps_land_stdv_oma , 0.0 , 3.0
+ps_paob_stdv_oma , 1.e+15, 1.e+15
+tv_drift_stdv_oma , 0.0 , 1.0
+tv_mls_stdv_oma , 1.e+15, 1.e+15
+u_drift_stdv_oma , 0.0 , 4.0
+v_drift_stdv_oma , 0.0 , 3.0
+ps_drift_stdv_oma , 0.0 , 3.0
+bang_gps_stdv_oma , 1.e+15, 1.e+15

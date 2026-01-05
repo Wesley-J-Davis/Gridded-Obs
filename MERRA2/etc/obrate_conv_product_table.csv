@@ -1,0 +1,30 @@
+	tv_raob_obrate,RADIOSONDE: Virtual temperature ;
+	qv_raob_obrate,RADIOSONDE: Specific humidity ;
+	u_raob_obrate,RADIOSONDE: Zonal wind   
+	v_raob_obrate,RADIOSONDE: Meridional wind   
+	ps_raob_obrate,RADIOSONDE: Surface pressure  
+	tv_acraft_obrate,AIRCRAFT: Virtual temperature ;
+	qv_acraft_obrate,AIRCRAFT: Specific humidity ;
+	u_acraft_obrate,AIRCRAFT: Zonal wind  
+	v_acraft_obrate,AIRCRAFT: Meridional wind  
+	u_prof_obrate,PROFILER: Zonal wind  
+	v_prof_obrate,PROFILER: Meridional wind  
+	u_scat_obrate,SCATTEROMETER: Zonal wind  
+	v_scat_obrate,SCATTEROMETER: Meridional wind  
+	w_ssmi_obrate,SSMI: Wind speed  
+	u_amv_obrate,ATMOS MOTION VECTORS: Zonal wind  
+	v_amv_obrate,ATMOS MOTION VECTORS: Meridional wind  
+	sst_sea_obrate,SEA SURFACE: Sea surface temperature  
+	tv_sea_obrate,SEA SURFACE: Virtual temperature ; 
+	ps_sea_obrate,SEA SURFACE: Surface pressure  
+	u_sea_obrate,SEA SURFACE: Zonal wind  
+	v_sea_obrate,SEA SURFACE: Meridional wind  
+	qv_sea_obrate,SEA SURFACE: Specific humidity ; 
+	ps_land_obrate,LAND SURFACE: Surface pressure  
+	ps_paob_obrate,PAOB SURFACE: Synthetic surface pressure  
+	tv_drift_obrate,Drifting Buoy: Virtual Temperature ;
+	tv_mls_obrate,MLS:           Virtual Temperature  
+	u_drift_obrate,Drifting Buoy: Zonal wind  
+	v_drift_obrate,Drifting Buoy: Meridional wind  
+	ps_drift_obrate,Drifting Buoy: Surface Pressure   
+	bang_gps_obrate,GPSRO Bending Angle 
