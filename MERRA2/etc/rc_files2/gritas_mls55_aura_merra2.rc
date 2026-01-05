@@ -1,0 +1,15 @@
+#
+# GrITAS Resource file.
+#
+#
+#  Vertical levels
+#  ---------------
+ 
+GrITAS*Vertical_Levels:   261.02 215.44 177.83 146.78 121.15 100.00 82.54 68.13 56.23 46.42 38.31 31.62 26.10 21.54 17.78 14.68 12.12 10 8.25 6.81 5.62 4.64 3.83 3.16 2.61 2.15 1.78 1.47 1.21 1 0.68 0.46 0.32 0.22 0.15 0.10 
+ 
+# User Defined Grid List 
+# ---------------------
+GrITAS*List::
+#  kt   var name                Title                           kx's
+   87     o3         "mls55_aura : Ozone Mixing Ratio        "  330 
+::
