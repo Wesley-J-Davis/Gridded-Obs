@@ -1,6 +1,5 @@
 #!/bin/csh
-set RootDir = /gpfsm/dnb34/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS
-set RC_DIR      = ${RootDir}/GrITAS/src/Components/gritas/GIO
+set RC_DIR      = /home/dao_ops/operations/GIT-OPS/Gridded-Obs/MERRA2/etc
 
 set lkount = 1
 set FIELD = $1
