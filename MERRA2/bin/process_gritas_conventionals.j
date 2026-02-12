@@ -14,33 +14,28 @@ limit stacksize unlimited
 setenv OMPI_MCA_btl_vader_single_copy_mechanism none
 setenv OMPI_MCA_btl ^openib     # Disable InfiniBand if not available
 
-set RootDir = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS/GrITAS
-set BinDir =  ${RootDir}/Linux/bin
+set BinDir =  /home/dao_ops/operations/M2_GRITAS/GrITAS/Linux/bin
 source $BinDir/g5_modules
-
-#source /gpfsm/dhome/dao_ops/d5124_m2_jan10/run/FVDAS_Run_Config
 set echo
 setenv TAG   merra2
 
-#set YEAR_TABLE = ( 201801 )
+set YEAR_TABLE = $1 
 #set INSTRUMENT_TABLE = 'conv'
-#set SYNOP_TABLE = ( 00 )
+set SYNOP_TABLE = $2
+set ExpID = $3
 
-set RC_DIR	= ${RootDir}/src/Components/gritas/GIO
+set RC_DIR	= /home/dao_ops/operations/GIT-OPS/Gridded-Obs/MERRA2/etc
 set RC_File  =  ${RC_DIR}/rc_files2/gritas_upconv_merra2.rc
 set RES      = 'd'
 set Gritas_Core_Opt  = "-nlevs 106 -rc $RC_File -hdf -res $RES -ncf -ospl -lb -nopassive"
 #set Gritas_Core_Opt  = "-nlevs 50 -rc $RC_File -res d -ncf -ospl -lb -nopassive"
 
-set WorkRootDir      =   /discover/nobackup/projects/gmao/merra2/data/obs/.WORK
-set ObsDir       =   /gpfsm/dhome/dao_ops/$ExpID/run/.../archive/obs 
-
+set WorkRootDir  =  /discover/nobackup/projects/gmao/merra2/data/obs/.WORK
 set Storage_Base =  $WorkRootDir/work_dir_wjd/conv/$RES
 set Work_Base	 =  $WorkRootDir/raw_obs_wjd/conv
 
 set n4zip_file   = ${RC_DIR}/n4zip.csh
 
-echo " RootDir  $RootDir"
 echo " BinDir   $BinDir"
 echo " RC_DIR   $RC_DIR"
 echo " n4zip_dir $n4zip_file"
