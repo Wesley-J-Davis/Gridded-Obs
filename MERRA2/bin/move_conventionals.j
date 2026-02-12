@@ -6,12 +6,16 @@
 #SBATCH --partition=datamove
 
 set echo
+set YEAR_TABLE =$1
+set SYNOP = $2
+set ExpID = $3
+
 set YYYY = `echo $YEAR_TABLE | cut -c 1-4`
 
-#set YEAR_TABLE = ( 201801 )
 set WORK_DIR   = /discover/nobackup/projects/gmao/merra2/data/obs/.WORK/raw_obs_wjd
 set OBS_DIR     = /discover/nobackup/projects/gmao/merra2/data/obs_dmf/GEOSadas-5_12_4/$ExpID/obs
 #set OBS_DIR     = /home/dao_ops/$ExpID/run/.../archive/obs
+
 mkdir -p $WORK_DIR
 
 foreach Date ( `echo $YEAR_TABLE` )
@@ -24,12 +28,7 @@ foreach Date ( `echo $YEAR_TABLE` )
                 set RES     = "d"
                 mkdir -p $WORK_DIR/$INSTRUMENT/$Date
                 #cd $WORK_DIR/$INSTRUMENT
-#                foreach Hour ( 00 06 12 18  )
                 foreach Hour ( $SYNOP  )
-
-                        #echo $YYYY
-                        #echo $MM
-			#ls -1 $OBS_DIR/Y$YYYY/M$MM/D*/H*/*${INSTRUMENT}*
                         set ods_Files = `ls -1 $OBS_DIR/Y$YYYY/M$MM/D*/H${Hour}/*${INSTRUMENT}*`                   # d5124_m2_jan10.diag_conv.20180101_00z.ods
                         echo $ods_Files
                         foreach FILE ( $ods_Files )
