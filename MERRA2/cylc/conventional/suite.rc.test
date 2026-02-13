@@ -14,14 +14,8 @@
         [[[P1M]]]  # Monthly aggregation tasks
             graph = """
                 process_synop[-PT6H] => metric_jobs => combine_synop
-            """
-        [[[PT6H]]]  # Back to synoptic for combine
-            graph = """
-                metric_jobs[^] => combine_synop
-            """
-        [[[P1M]]]  # Final monthly tasks
-            graph = """
                 combine_synop[-PT6H] => combine_all_synop & hourly_jobs
+                combine_all_synop & hourly_jobs => move_synop
             """
 
 [runtime]
