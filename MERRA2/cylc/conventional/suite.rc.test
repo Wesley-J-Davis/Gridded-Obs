@@ -1,0 +1,32 @@
+#!Jinja2
+[meta]
+    title = "M2 Conv Obs"
+
+[scheduling]
+    initial cycle point = 19800101T00
+    final cycle point = 20240601T00
+    
+    [[dependencies]]
+        [[[PT6H]]]  # 6-hourly cycling for synoptic times
+            graph = """
+                move_synop => process_synop
+            """
+        [[[P1M]]]  # Monthly aggregation tasks
+            graph = """
+                process_synop[-PT6H] => metric_jobs => combine_synop
+            """
+        [[[PT6H]]]  # Back to synoptic for combine
+            graph = """
+                metric_jobs[^] => combine_synop
+            """
+        [[[P1M]]]  # Final monthly tasks
+            graph = """
+                combine_synop[-PT6H] => combine_all_synop & hourly_jobs
+            """
+
+[runtime]
+    [[root]]
+        [[[environment]]]
+            STORAGE_DIR = /discover/nobackup/projects/gmao/merra2/data/obs/.WORK/products_revised
+            HOST_DIR = /discover/nobackup/projects/gmao/merra2/data/obs/work_dir_wjd
+            SCRIPT_DIR = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS/bin
