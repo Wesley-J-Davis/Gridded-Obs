@@ -6,7 +6,7 @@
 #SBATCH --partition=datamove
 
 set echo
-set YEAR_TABLE =$1
+set YEAR_TABLE = $1
 set SYNOP = $2
 set ExpID = $3
 

@@ -49,7 +49,6 @@ foreach YYYYMM ( `echo $YEAR_TABLE` )
 
    set YYYY = `echo $YYYYMM | cut -c 1-4`
    set MM   = `echo $YYYYMM | cut -c 5-6`
-   set DateFrag = ${YYYY}${MM}
 
    set WorkDir     = ${Work_Base}/${YEAR_TABLE}
    set STORAGE_DIR = ${Storage_Base}/Y$YYYY/M$MM
@@ -90,10 +89,10 @@ foreach YYYYMM ( `echo $YEAR_TABLE` )
       set out_fileo   = gritaso${Hour}
       /bin/rm -f ${out_fileo}.{bias,stdv,nobs}.nc4
                         # Print MPI and resource information
-                        echo "Starting MPI statistical calculations at `date`"
-                        echo "Number of MPI processes: $SLURM_NTASKS"
-                        echo "Processes per node: $SLURM_NTASKS_PER_NODE"
-                        echo "Available memory: `free -h`"
+                        #echo "Starting MPI statistical calculations at `date`"
+                        #echo "Number of MPI processes: $SLURM_NTASKS"
+                        #echo "Processes per node: $SLURM_NTASKS_PER_NODE"
+                        #echo "Available memory: `free -h`"
                         #mpirun -np $SLURM_NTASKS 
 			$gritas -obs -o $out_fileo $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr &
       wait
@@ -101,10 +100,10 @@ foreach YYYYMM ( `echo $YEAR_TABLE` )
       set out_filef   = gritasf${Hour}
       /bin/rm -f ${out_filef}.{bias,stdv,nobs}.hdf
                         # Print MPI and resource information
-                        echo "Starting MPI statistical calculations at `date`"
-                        echo "Number of MPI processes: $SLURM_NTASKS"
-                        echo "Processes per node: $SLURM_NTASKS_PER_NODE"
-                        echo "Available memory: `free -h`"
+                        #echo "Starting MPI statistical calculations at `date`"
+                        #echo "Number of MPI processes: $SLURM_NTASKS"
+                        #echo "Processes per node: $SLURM_NTASKS_PER_NODE"
+                        #echo "Available memory: `free -h`"
                         #mpirun -np $SLURM_NTASKS 
 			$gritas -omf -o $out_filef $Gritas_Core_Opt ${ExpID}.diag_conv_ges.$DateHr &
       wait
@@ -113,10 +112,10 @@ foreach YYYYMM ( `echo $YEAR_TABLE` )
       /bin/rm -f ${out_filea}.{bias,stdv,nobs}.hdf
 
                         # Print MPI and resource information
-                        echo "Starting MPI statistical calculations at `date`"
-                        echo "Number of MPI processes: $SLURM_NTASKS"
-                        echo "Processes per node: $SLURM_NTASKS_PER_NODE"
-                        echo "Available memory: `free -h`"
+                        #echo "Starting MPI statistical calculations at `date`"
+                        #echo "Number of MPI processes: $SLURM_NTASKS"
+                        #echo "Processes per node: $SLURM_NTASKS_PER_NODE"
+                        #echo "Available memory: `free -h`"
                         #mpirun -np $SLURM_NTASKS 
 			$gritas -oma -o $out_filea $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr &
       wait
