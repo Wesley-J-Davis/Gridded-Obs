@@ -14,7 +14,9 @@ limit stacksize unlimited
 setenv OMPI_MCA_btl_vader_single_copy_mechanism none
 setenv OMPI_MCA_btl ^openib     # Disable InfiniBand if not available
 
-set BinDir =  /home/dao_ops/operations/M2_GRITAS/GrITAS/Linux/bin
+#set BinDir =  /home/dao_ops/operations/M2_GRITAS/GrITAS/Linux/bin
+#set BinDir = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS/GrITAS/Linux/bin
+set BinDir = $BIN_DIR
 source $BinDir/g5_modules
 set echo
 setenv TAG   merra2
