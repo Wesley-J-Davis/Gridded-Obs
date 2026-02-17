@@ -19,6 +19,7 @@
             STORAGE_DIR = /discover/nobackup/projects/gmao/merra2/data/obs/.WORK/products_revised
             HOST_DIR = /discover/nobackup/projects/gmao/merra2/data/obs/work_dir_wjd
             SCRIPT_DIR = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS/bin
+            BIN_DIR = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS/GrITAS/Linux/bin
 
     [[debug]]
         script = """
@@ -263,12 +264,6 @@
        echo "All combine completed"
 
         """
-<<<<<<< HEAD
-=======
-        [[[job]]]
-            batch system = slurm
-            execution time limit = PT2H
->>>>>>> parent of 65a50e3 (Remove slurm job configurations from suite.rc)
 
     [[hourly_jobs]]
         script = """
