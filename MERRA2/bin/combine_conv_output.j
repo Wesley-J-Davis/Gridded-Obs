@@ -1,26 +1,22 @@
 #!/bin/csh  
 
-#SBATCH --time=0:15:00
+#SBATCH --time=1:00:00
 #SBATCH --constraint=cas
 #SBATCH --account=g2538
 #SBATCH --partition=preops
 
-setenv TAG  merra2
-set RootDir = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS
+set echo
 
-set BinDir  = ${RootDir}/GrITAS/Linux/bin
+setenv TAG  merra2
+set BinDir  = /home/dao_ops/operations/M2_GRITAS/GrITAS/Linux/bin
 source $BinDir/g5_modules
 module load nco
-set echo
-setenv ESMADIR /home/dao_ops/GEOSadas-5_41_3/GEOSadas
-set GEOS_BINDIR = $ESMADIR/install/bin
 
 set STORAGE_DIR = /discover/nobackup/projects/gmao/merra2/data/obs/.WORK/products_revised
-set RC_DIR      = ${RootDir}/GrITAS/src/Components/gritas/GIO
-set HOST_DIR = /discover/nobackup/projects/gmao/merra2/data/obs/.WORK/work_dir_wjd
-#set HOST_DIR = /discover/nobackup/projects/gmao/merra2/data/obs/products
+set RC_DIR      = /home/dao_ops/operations/GIT-OPS/Gridded-Obs/MERRA2/etc/
+set HOST_DIR    = /discover/nobackup/projects/gmao/merra2/data/obs/.WORK/work_dir_wjd
 
-#set YEAR_TABLE = ( 201801 )
+set YEAR_TABLE = $1
 #set HOST_DIR     = $2
 #set STORAGE_DIR  = $3
 
@@ -34,7 +30,7 @@ unset argv
 setenv argv
 set argv = ( $TEMP_argv )
 # all 00 06 12 18
-#set SYNOP_TABLE = ( all 00 06 12 18 )
+set SYNOP_TABLE = ( 00 06 12 18 all )
 #set INSTRUMENT_TABLE = 'conv'
 set METADATA_TABLE = ${RC_DIR}/metadata.tbl
 set PRODUCT_TABLE  = ${RC_DIR}/M2_OPS_product_table.csv
@@ -45,9 +41,9 @@ foreach INSTRUMENT ( `echo $INSTRUMENT_TABLE` )
     set YYYY = `echo $YYYYMM | cut -c1-4`
     set   MM = `echo $YYYYMM | cut -c5-6`
     set CurrentMonth_FirstDay  = ${YYYY}${MM}01
-    set PreviousMonth_LastDay = `${GEOS_BINDIR}/tick ${CurrentMonth_FirstDay} 000000 -1 0 | cut -d' ' -f1`
-    set NextMonth             = `${GEOS_BINDIR}/tick ${CurrentMonth_FirstDay} 000000 32 0 | cut -d' ' -f1 | cut -c1-6`
-    set CurrentMonth_LastDay = `${GEOS_BINDIR}/tick ${NextMonth}01 000000 -1 0 | cut -d' ' -f1`
+    set PreviousMonth_LastDay = `/home/dao_ops/bin/tick ${CurrentMonth_FirstDay} 000000 -1 0 | cut -d' ' -f1`
+    set NextMonth             = `/home/dao_ops/bin/tick ${CurrentMonth_FirstDay} 000000 32 0 | cut -d' ' -f1 | cut -c1-6`
+    set CurrentMonth_LastDay = `/home/dao_ops/bin/tick ${NextMonth}01 000000 -1 0 | cut -d' ' -f1`
     
     # Reformat dates
     set yyyy = `echo ${CurrentMonth_FirstDay} | cut -c1-4`
@@ -151,7 +147,7 @@ foreach INSTRUMENT ( `echo $INSTRUMENT_TABLE` )
                 endif
               endif
               if ($MODE == "obrate" ) then
-                set  LONGNAME = `/usr/bin/csh ${RC_DIR}/get_conv_longname.csh $FIELDO ${MODE}`
+                set  LONGNAME = `/usr/bin/csh /home/dao_ops/operations/GIT-OPS/Gridded-Obs/MERRA2/bin/get_conv_longname.csh $FIELDO ${MODE}`
                 echo $FIELDO  $LONGNAME
                 time ncatted -h -O -a comments,$FIELDO,o,c,"${MODE}"   $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_obs.${YYYY}${MM}${SYNOP}.nc4
                 time ncatted -h -O -a long_name,$FIELDO,o,c,"$LONGNAME"   $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_obs.${YYYY}${MM}${SYNOP}.nc4
@@ -280,7 +276,7 @@ foreach INSTRUMENT ( `echo $INSTRUMENT_TABLE` )
               set granuleid = merra2.${INSTRUMENT}.${YYYY}${MM}${SYNOP}.nc4
               echo $granule
             endif
-            echo " Adding metta data"
+            echo " Adding metadata"
             ncatted -h  -O ${granule}   \
               -a Title,global,o,c,"${title}" \
               -a ShortName,global,o,c,"${shortname}" \
@@ -326,8 +322,7 @@ foreach INSTRUMENT ( `echo $INSTRUMENT_TABLE` )
               -a standard_name,lon,o,c,"longitude" \
               -a calendar,time,o,c,"standard" \
               -a units,time,o,c,"minutes since ${CurrentMonth_FirstDay} ${HOUR0}:00:00"
-            	${RC_DIR}/run_n4zip.csh $granule
-		#$ESMADIR/install/bin/n4zip  $granule
+            /home/dao_ops/operations/GIT-OPS/Gridded-Obs/MERRA2/bin/run_n4zip.csh $granule
           endif   # skipping meta data
           echo " ----------------------------"
           echo "      $SYNOP  TIME           "

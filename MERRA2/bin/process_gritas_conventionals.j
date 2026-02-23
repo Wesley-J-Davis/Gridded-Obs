@@ -14,33 +14,30 @@ limit stacksize unlimited
 setenv OMPI_MCA_btl_vader_single_copy_mechanism none
 setenv OMPI_MCA_btl ^openib     # Disable InfiniBand if not available
 
-set RootDir = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS/GrITAS
-set BinDir =  ${RootDir}/Linux/bin
+#set BinDir =  /home/dao_ops/operations/M2_GRITAS/GrITAS/Linux/bin
+#set BinDir = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS/GrITAS/Linux/bin
+set BinDir = $BIN_DIR
 source $BinDir/g5_modules
-
-#source /gpfsm/dhome/dao_ops/d5124_m2_jan10/run/FVDAS_Run_Config
 set echo
 setenv TAG   merra2
 
-#set YEAR_TABLE = ( 201801 )
+set YEAR_TABLE = $1 
 #set INSTRUMENT_TABLE = 'conv'
-#set SYNOP_TABLE = ( 00 )
+set SYNOP_TABLE = $2
+set ExpID = $3
 
-set RC_DIR	= ${RootDir}/src/Components/gritas/GIO
+set RC_DIR	= /home/dao_ops/operations/GIT-OPS/Gridded-Obs/MERRA2/etc
 set RC_File  =  ${RC_DIR}/rc_files2/gritas_upconv_merra2.rc
 set RES      = 'd'
 set Gritas_Core_Opt  = "-nlevs 106 -rc $RC_File -hdf -res $RES -ncf -ospl -lb -nopassive"
 #set Gritas_Core_Opt  = "-nlevs 50 -rc $RC_File -res d -ncf -ospl -lb -nopassive"
 
-set WorkRootDir      =   /discover/nobackup/projects/gmao/merra2/data/obs/.WORK
-set ObsDir       =   /gpfsm/dhome/dao_ops/$ExpID/run/.../archive/obs 
-
+set WorkRootDir  =  /discover/nobackup/projects/gmao/merra2/data/obs/.WORK
 set Storage_Base =  $WorkRootDir/work_dir_wjd/conv/$RES
 set Work_Base	 =  $WorkRootDir/raw_obs_wjd/conv
 
 set n4zip_file   = ${RC_DIR}/n4zip.csh
 
-echo " RootDir  $RootDir"
 echo " BinDir   $BinDir"
 echo " RC_DIR   $RC_DIR"
 echo " n4zip_dir $n4zip_file"
@@ -54,7 +51,6 @@ foreach YYYYMM ( `echo $YEAR_TABLE` )
 
    set YYYY = `echo $YYYYMM | cut -c 1-4`
    set MM   = `echo $YYYYMM | cut -c 5-6`
-   set DateFrag = ${YYYY}${MM}
 
    set WorkDir     = ${Work_Base}/${YEAR_TABLE}
    set STORAGE_DIR = ${Storage_Base}/Y$YYYY/M$MM
@@ -95,10 +91,10 @@ foreach YYYYMM ( `echo $YEAR_TABLE` )
       set out_fileo   = gritaso${Hour}
       /bin/rm -f ${out_fileo}.{bias,stdv,nobs}.nc4
                         # Print MPI and resource information
-                        echo "Starting MPI statistical calculations at `date`"
-                        echo "Number of MPI processes: $SLURM_NTASKS"
-                        echo "Processes per node: $SLURM_NTASKS_PER_NODE"
-                        echo "Available memory: `free -h`"
+                        #echo "Starting MPI statistical calculations at `date`"
+                        #echo "Number of MPI processes: $SLURM_NTASKS"
+                        #echo "Processes per node: $SLURM_NTASKS_PER_NODE"
+                        #echo "Available memory: `free -h`"
                         #mpirun -np $SLURM_NTASKS 
 			$gritas -obs -o $out_fileo $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr &
       wait
@@ -106,10 +102,10 @@ foreach YYYYMM ( `echo $YEAR_TABLE` )
       set out_filef   = gritasf${Hour}
       /bin/rm -f ${out_filef}.{bias,stdv,nobs}.hdf
                         # Print MPI and resource information
-                        echo "Starting MPI statistical calculations at `date`"
-                        echo "Number of MPI processes: $SLURM_NTASKS"
-                        echo "Processes per node: $SLURM_NTASKS_PER_NODE"
-                        echo "Available memory: `free -h`"
+                        #echo "Starting MPI statistical calculations at `date`"
+                        #echo "Number of MPI processes: $SLURM_NTASKS"
+                        #echo "Processes per node: $SLURM_NTASKS_PER_NODE"
+                        #echo "Available memory: `free -h`"
                         #mpirun -np $SLURM_NTASKS 
 			$gritas -omf -o $out_filef $Gritas_Core_Opt ${ExpID}.diag_conv_ges.$DateHr &
       wait
@@ -118,10 +114,10 @@ foreach YYYYMM ( `echo $YEAR_TABLE` )
       /bin/rm -f ${out_filea}.{bias,stdv,nobs}.hdf
 
                         # Print MPI and resource information
-                        echo "Starting MPI statistical calculations at `date`"
-                        echo "Number of MPI processes: $SLURM_NTASKS"
-                        echo "Processes per node: $SLURM_NTASKS_PER_NODE"
-                        echo "Available memory: `free -h`"
+                        #echo "Starting MPI statistical calculations at `date`"
+                        #echo "Number of MPI processes: $SLURM_NTASKS"
+                        #echo "Processes per node: $SLURM_NTASKS_PER_NODE"
+                        #echo "Available memory: `free -h`"
                         #mpirun -np $SLURM_NTASKS 
 			$gritas -oma -o $out_filea $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr &
       wait
