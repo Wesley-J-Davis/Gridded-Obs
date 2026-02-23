@@ -118,11 +118,12 @@
         metric_job_ids=()
         YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
         SLURM_LOG_DIR=${CYLC_TASK_WORK_DIR}
+        source $BIN_DIR/g5_modules
         
         # Run all three metrics sequentially
         for metric in obrate means rms; do
             echo "Processing metric: $metric for $YEAR_TABLE"
-            metric_job=$(sbatch --parsable -J ${YEAR_TABLE}.conv.${metric} -o ${SLURM_LOG_DIR}/${metric}.log --export=YEAR_TABLE=${YEAR_TABLE},METRIC=${metric} --nodes=1 --ntasks-per-node=1 --cpus-per-task=1 --time=1:30:00 ${SCRIPT_DIR}/process_conv_means.j $YEAR_TABLE  $metric)            
+            metric_job=$(sbatch --parsable -J ${YEAR_TABLE}.conv.${metric} -o ${SLURM_LOG_DIR}/${metric}.log --export=YEAR_TABLE=${YEAR_TABLE},METRIC=${metric} --nodes=1 --ntasks-per-node=1 --export=ALL --cpus-per-task=1 --time=1:30:00 ${SCRIPT_DIR}/process_conv_means.j $YEAR_TABLE  $metric)
             metric_job_ids+=($metric_job)
             echo "    - metric job: $metric_job"
         done
