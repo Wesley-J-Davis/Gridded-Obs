@@ -1,22 +1,23 @@
-#!/bin/csh
+#!/bin/csh -f
 
 # Set modules
 # -----------
 set echo
-
-export OMPI_MCA_btl_vader_single_copy_mechanism=none
-export OMPI_MCA_btl=^openib     # Disable InfiniBand if not available
+echo "begin gritas2means.csh"
+#setenv OMPI_MCA_btl_vader_single_copy_mechanism=none
+#export OMPI_MCA_btl=^openib     # Disable InfiniBand if not available
 
 # Set Dirs and Scripts
 
-set RootDir = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS
-set BinDir  = ${RootDir}/GrITAS/Linux/bin
-source $BinDir/g5_modules
-#source /gpfsm/dhome/dao_ops/d5124_m2_jan10/run/FVDAS_Run_Config
-set RC_DIR=${RootDir}/GrITAS/src/Components/gritas/GIO
+set RootDir = /home/dao_ops/operations/GIT-OPS/Gridded-Obs/MERRA2
+#set BinDir  = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS/GrITAS/Linux/bin
+set BinDir = $BIN_DIR
+#source $BinDir/g5_modules
+
+set RC_DIR=${RootDir}/etc/rc_files2
 echo "gritas2means: $RootDir" 
 echo "gritas2means: $BinDir" 
-set n4zip = ${RC_DIR}/n4zip.csh
+set n4zip = ${RootDir}/bin/n4zip.csh
 echo "gritas2means: $n4zip" 
 set grmeans = ${BinDir}/GFIO_mean_r8.x
 
@@ -118,10 +119,9 @@ if ( $#ReqArgv < 1 ) goto err
      echo $InFiles
      set OutFiles = ( $OutFiles $OutFile )
 	echo "Starting MPI statistical calculations at `date`"
-	echo "Number of MPI processes: $SLURM_NTASKS"
-	echo "Processes per node: $SLURM_NTASKS_PER_NODE"
-	echo "Available memory: `free -h`"
-        
+	#echo "Number of MPI processes: $SLURM_NTASKS"
+	#echo "Processes per node: $SLURM_NTASKS_PER_NODE"
+	#echo "Available memory: `free -h`"
         # Run MPI Fortran program
         #mpirun -np $SLURM_NTASKS
 	$grmeans $Options -inc 060000 $InFiles -o $OutFile; set Status = $status
@@ -136,10 +136,10 @@ if ( $#ReqArgv < 1 ) goto err
         set OutFile  = $ExpID.mon_${Result}_${Quant}.${Year}${Month}_${SynTime}z.nc4; /bin/rm -f $OutFile
         set InFiles  = `ls ./D*/$ExpID.${InFile_Result}3d_${Quant}_p.${Year}${Month}*_${SynTime}z.nc4`
         set OutFiles = ( $OutFiles $OutFile )
-        echo "Starting MPI statistical calculations at `date`"
-        echo "Number of MPI processes: $SLURM_NTASKS"
-        echo "Processes per node: $SLURM_NTASKS_PER_NODE"
-        echo "Available memory: `free -h`"
+        #echo "Starting MPI statistical calculations at `date`"
+        #echo "Number of MPI processes: $SLURM_NTASKS"
+        #echo "Processes per node: $SLURM_NTASKS_PER_NODE"
+        #echo "Available memory: `free -h`"
 
         # Run MPI Fortran program
         # mpirun -np $SLURM_NTASKS 

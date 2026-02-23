@@ -118,7 +118,7 @@
         metric_job_ids=()
         YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
         SLURM_LOG_DIR=${CYLC_TASK_WORK_DIR}
-        source $BIN_DIR/g5_modules
+        source $BIN_DIR/.g5_modules.sh
         
         # Run all three metrics sequentially
         for metric in obrate means rms; do
