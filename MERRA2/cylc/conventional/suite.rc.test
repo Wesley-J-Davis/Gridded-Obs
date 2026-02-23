@@ -7,15 +7,18 @@
     final cycle point = 20240601T00
     
     [[dependencies]]
-        [[[PT6H]]]  # 6-hourly cycling for synoptic times
+        [[[P1M]]]  # Monthly cycling - runs 4 synoptic times per month
             graph = """
-                move_synop => process_synop
-            """
-        [[[P1M]]]  # Monthly aggregation tasks
-            graph = """
-                process_synop[-PT6H] => metric_jobs => combine_synop
-                combine_synop[-PT6H] => combine_all_synop & hourly_jobs
-                combine_all_synop & hourly_jobs => move_synop
+                move_synop_00 => process_synop_00
+                move_synop_06 => process_synop_06
+                move_synop_12 => process_synop_12
+                move_synop_18 => process_synop_18
+                
+                process_synop_00 & process_synop_06 & process_synop_12 & process_synop_18 => metric_jobs
+                
+                metric_jobs => combine_synop_00 & combine_synop_06 & combine_synop_12 & combine_synop_18
+                
+                combine_synop_00 & combine_synop_06 & combine_synop_12 & combine_synop_18 => combine_all_synop & hourly_jobs
             """
 
 [runtime]
@@ -24,11 +27,13 @@
             STORAGE_DIR = /discover/nobackup/projects/gmao/merra2/data/obs/.WORK/products_revised
             HOST_DIR = /discover/nobackup/projects/gmao/merra2/data/obs/work_dir_wjd
             SCRIPT_DIR = /home/dao_ops/operations/GIT-OPS/Gridded-Obs/MERRA2/bin
+            BIN_DIR = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS/GrITAS/Linux/bin
+
 
     [[move_synop]]
         script = """
-        set -e  
-        set -x  
+        #!/bin/csh
+        set echo
         
         cd ${SCRIPT_DIR}
         
@@ -64,10 +69,13 @@
         [[[environment]]]
             INSTRUMENT_TABLE = conv
 
+    [[move_synop_00, move_synop_06, move_synop_12, move_synop_18]]
+        inherit = move_synop
+
     [[process_synop]]
         script = """
-        set -e
-        set -x
+        #!/bin/csh
+        set echo
         
         cd ${SCRIPT_DIR}
         
@@ -100,20 +108,21 @@
         [[[environment]]]
             INSTRUMENT_TABLE = conv
 
+    [[process_synop_00, process_synop_06, process_synop_12, process_synop_18]]
+        inherit = process_synop
+
     [[metric_jobs]]
         script = """
         set -e
         set -x
-        
-        cd ${SCRIPT_DIR}
-        
         YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
+        cd ${SCRIPT_DIR}
         
         # Run all three metrics sequentially
         for metric in obrate means rms; do
             echo "Processing metric: $metric for $YEAR_TABLE"
-            export METRIC=$metric
-            ${SCRIPT_DIR}/process_conv_means.j
+            ${SCRIPT_DIR}/gritas2means.sh $YEAR_TABLE -r $metric
+            wait
         done
         """
         
@@ -156,6 +165,9 @@
         
         [[[environment]]]
             INSTRUMENT_TABLE = conv
+
+    [[combine_synop_00, combine_synop_06, combine_synop_12, combine_synop_18]]
+        inherit = combine_synop
 
     [[combine_all_synop]]
         script = """
