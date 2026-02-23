@@ -122,7 +122,7 @@
         # Run all three metrics sequentially
         for metric in obrate means rms; do
             echo "Processing metric: $metric for $YEAR_TABLE"
-            metric_job=$(sbatch --parsable -J ${YEAR_TABLE}.conv.${metric} -o ${SLURM_LOG_DIR}/${metric}.log --export=YEAR_TABLE=${YEAR_TABLE},METRIC=${metric} --nodes=1 --ntasks-per-node=1 --cpus-per-task=1 --time=1:30:00 ${SCRIPT_DIR}/gritas2means.csh $YEAR_TABLE -r $metric)            
+            metric_job=$(sbatch --parsable -J ${YEAR_TABLE}.conv.${metric} -o ${SLURM_LOG_DIR}/${metric}.log --export=YEAR_TABLE=${YEAR_TABLE},METRIC=${metric} --nodes=1 --ntasks-per-node=1 --cpus-per-task=1 --time=1:30:00 ${SCRIPT_DIR}/process_conv_means.j $YEAR_TABLE  $metric)            
             metric_job_ids+=($metric_job)
             echo "    - metric job: $metric_job"
         done
