@@ -115,20 +115,26 @@
         script = """
         set -e
         set -x
+        metric_job_ids=()
         YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
-        cd ${SCRIPT_DIR}
+        SLURM_LOG_DIR=${CYLC_TASK_WORK_DIR}
         
         # Run all three metrics sequentially
         for metric in obrate means rms; do
             echo "Processing metric: $metric for $YEAR_TABLE"
-            ${SCRIPT_DIR}/gritas2means.sh $YEAR_TABLE -r $metric
-            wait
+            metric_job=$(sbatch --parsable -J ${YEAR_TABLE}.conv.${metric} -o ${SLURM_LOG_DIR}/${metric}.log --export=YEAR_TABLE=${YEAR_TABLE},METRIC=${metric} --nodes=1 --ntasks-per-node=1 --cpus-per-task=1 --time=1:30:00 ${SCRIPT_DIR}/gritas2means.csh $YEAR_TABLE -r $metric)            
+            metric_job_ids+=($metric_job)
+            echo "    - metric job: $metric_job"
         done
+
+        metric_deps=$(IFS=':'; echo "${metric_job_ids[*]}")
+        for job_id in "${metric_job_ids[@]}"; do
+          while squeue -j $job_id >/dev/null 2>&1; do
+            sleep 300
+          done
+        done
+        echo "All $metric_deps jobs completed"
         """
-        
-        [[[job]]]
-            batch system = slurm
-            execution time limit = PT2H
 
     [[combine_synop]]
         script = """
