@@ -36,7 +36,7 @@ set WorkRootDir  =  /discover/nobackup/projects/gmao/merra2/data/obs/.WORK
 set Storage_Base =  $WorkRootDir/work_dir_wjd/conv/$RES
 set Work_Base	 =  $WorkRootDir/raw_obs_wjd/conv
 
-set n4zip_file   = ${RC_DIR}/n4zip.csh
+set n4zip_file   = /home/dao_ops/operations/GIT-OPS/Gridded-Obs/MERRA2/bin/n4zip.csh
 
 echo " BinDir   $BinDir"
 echo " RC_DIR   $RC_DIR"
