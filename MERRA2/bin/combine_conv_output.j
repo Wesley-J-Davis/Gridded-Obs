@@ -8,8 +8,8 @@
 set echo
 
 setenv TAG  merra2
-set BinDir  = /home/dao_ops/operations/M2_GRITAS/GrITAS/Linux/bin
-source $BinDir/g5_modules
+#set BinDir  = /home/dao_ops/operations/M2_GRITAS/GrITAS/Linux/bin
+#source $BinDir/g5_modules
 module load nco
 
 set STORAGE_DIR = /discover/nobackup/projects/gmao/merra2/data/obs/.WORK/products_revised
