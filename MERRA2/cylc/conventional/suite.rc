@@ -193,7 +193,7 @@
         echo "Combining synoptic time: $SYNOP for $YEAR_TABLE"
         
         # Execute the combine script with synoptic time as argument
-        ${SCRIPT_DIR}/combine_conv_output.j $SYNOP
+        ${SCRIPT_DIR}/combine_conv_output.j $YEAR_TABLE $SYNOP
         """
         
         [[[job]]]
@@ -229,7 +229,7 @@
         echo "Combining all synoptic times for $YEAR_TABLE"
         
         # Execute the combine script with "all" argument
-        ${SCRIPT_DIR}/combine_conv_output.j all
+        ${SCRIPT_DIR}/combine_conv_output.j $YEAR_TABLE all
         """
         
         [[[job]]]
