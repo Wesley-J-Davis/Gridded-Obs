@@ -11,18 +11,18 @@ umask 022
 limit stacksize unlimited
 
 # Set MPI environment variables
-setenv OMPI_MCA_btl_vader_single_copy_mechanism none
-setenv OMPI_MCA_btl ^openib     # Disable InfiniBand if not available
+#setenv OMPI_MCA_btl_vader_single_copy_mechanism none
+#setenv OMPI_MCA_btl ^openib     # Disable InfiniBand if not available
 
 #set BinDir =  /home/dao_ops/operations/M2_GRITAS/GrITAS/Linux/bin
 #set BinDir = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS/GrITAS/Linux/bin
-set BinDir = $BIN_DIR
-source $BinDir/g5_modules
+#set BinDir = $BIN_DIR
+#source $BinDir/g5_modules
 set echo
 setenv TAG   merra2
 
 set YEAR_TABLE = $1 
-#set INSTRUMENT_TABLE = 'conv'
+set INSTRUMENT_TABLE = 'conv'
 set SYNOP_TABLE = $2
 set ExpID = $3
 
@@ -143,8 +143,5 @@ foreach YYYYMM ( `echo $YEAR_TABLE` )
     end
     @ Day0 = $Day0 + 1
    end
-   #csh -vx ${RC_DIR}/daoit_gritas2means.csh0 ${YYYY}${MM} -r means
-   #csh -vx ${RC_DIR}/daoit_gritas2means.csh0 ${YYYY}${MM} -r rms
-   #csh -vx ${RC_DIR}/daoit_gritas2means.csh0 ${YYYY}${MM} -r obrate
 end
 echo $STORAGE_DIR
