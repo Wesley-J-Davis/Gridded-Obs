@@ -61,15 +61,6 @@
         ${SCRIPT_DIR}/move_conventionals.j $YEAR_TABLE $SYNOP $ExpID
         """
         
-        [[[job]]]
-            batch system = slurm
-            execution time limit = PT2H
-        [[[directives]]]
-            --nodes = 1
-            --ntasks-per-node = 1
-            --cpus-per-task = 1
-            --export = ALL
-
     [[move_synop_00, move_synop_06, move_synop_12, move_synop_18]]
         inherit = move_synop
 
