@@ -121,8 +121,9 @@ foreach YYYYMM ( `echo $YEAR_TABLE` )
                         #mpirun -np $SLURM_NTASKS 
 			$gritas -oma -o $out_filea $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr &
       wait
-      # clean the work dir for that day of any pre-existing temp files for that synoptic time
-      /bin/rm ${DayDir}/*${Hour}z*nc4*pid*.tmp
+      # clean the work dir for that day of any pre-existing files for that synoptic time
+      /bin/rm -f ${DayDir}/*${Hour}z*nc4*pid*.tmp
+      /bin/rm -f ${DayDir}/*.nc4 
 
       mv ${out_fileo}.bias.hdf ${DayDir}/$TAG.mean3d_obs_p.${Date}_${Hour}z.nc4
       mv ${out_fileo}.stdv.hdf ${DayDir}/$TAG.stdv3d_obs_p.${Date}_${Hour}z.nc4
