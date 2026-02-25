@@ -11,14 +11,15 @@ umask 022
 limit stacksize unlimited
 
 # Set MPI environment variables
-#setenv OMPI_MCA_btl_vader_single_copy_mechanism none
-#setenv OMPI_MCA_btl ^openib     # Disable InfiniBand if not available
+setenv OMPI_MCA_btl_vader_single_copy_mechanism none
+setenv OMPI_MCA_btl ^openib     # Disable InfiniBand if not available
 
 #set BinDir =  /home/dao_ops/operations/M2_GRITAS/GrITAS/Linux/bin
-#set BinDir = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS/GrITAS/Linux/bin
-set BinDir = $BIN_DIR
-#source $BinDir/g5_modules
-set echo
+set BinDir = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS/GrITAS/Linux/bin
+#set BinDir = $BIN_DIR
+source $BinDir/g5_modules
+module load nco
+echo "BASEDIR = $BASEDIR"
 setenv TAG   merra2
 
 set YEAR_TABLE = $1 

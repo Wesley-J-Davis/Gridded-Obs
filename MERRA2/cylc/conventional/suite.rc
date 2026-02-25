@@ -62,8 +62,9 @@
         inherit = move_synop
 
     [[process_synop]]
-        pre-script = "source $BIN_DIR/.g5_modules.sh"
+        pre-script = "source $BIN_DIR/.g5_modules.sh; module load nco"
         script = """
+        
         set echo
         
         cd ${SCRIPT_DIR}
