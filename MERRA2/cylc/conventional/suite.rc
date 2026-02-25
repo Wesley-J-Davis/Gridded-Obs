@@ -29,9 +29,6 @@
             HOST_DIR = /discover/nobackup/projects/gmao/merra2/data/obs/work_dir_wjd
             SCRIPT_DIR = /home/dao_ops/operations/GIT-OPS/Gridded-Obs/MERRA2/bin
             BIN_DIR = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS/GrITAS/Linux/bin
-        script = """
-        source $BIN_DIR/.g5_modules.sh
-        """
 
     [[move_synop]]
         script = """
@@ -65,6 +62,7 @@
         inherit = move_synop
 
     [[process_synop]]
+        pre-script = "source $BIN_DIR/.g5_modules.sh"
         script = """
         set echo
         
@@ -102,6 +100,7 @@
         inherit = process_synop
 
 [[metric_obrate]]
+        pre-script = "source $BIN_DIR/.g5_modules.sh"
         script = """
         set -e
         set -x
@@ -121,6 +120,7 @@
             --export = ALL
 
     [[metric_means]]
+        pre-script = "source $BIN_DIR/.g5_modules.sh"
         script = """
         set -e
         set -x
@@ -140,6 +140,7 @@
             --export = ALL
 
     [[metric_rms]]
+        pre-script = "source $BIN_DIR/.g5_modules.sh"
         script = """
         set -e
         set -x
