@@ -16,7 +16,7 @@ limit stacksize unlimited
 
 #set BinDir =  /home/dao_ops/operations/M2_GRITAS/GrITAS/Linux/bin
 #set BinDir = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS/GrITAS/Linux/bin
-#set BinDir = $BIN_DIR
+set BinDir = $BIN_DIR
 #source $BinDir/g5_modules
 set echo
 setenv TAG   merra2
