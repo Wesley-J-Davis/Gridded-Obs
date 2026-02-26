@@ -377,21 +377,19 @@
         [[[job]]]
             batch system = slurm
             execution time limit = PT1H
-        [[[directives]]]
-            export = ALL
 
-    [[hourly_jobs]]
+[[hourly_jobs]]
         script = """
         set -e
         set -x
-        
+
         cd ${SCRIPT_DIR}
-        
+
         YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
         YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
         MM=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 5-6)
         mm=$((10#$MM))
-        
+
         # Determine ExpID
         if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
             export ExpID=d5124_m2_jan79
@@ -402,10 +400,10 @@
         elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
             export ExpID=d5124_m2_jan10
         fi
-        
+
         # Calculate days in month
         DAY_TABLE=(31 28 31 30 31 30 31 31 30 31 30 31)
-        
+
         if [ "$MM" == "02" ]; then
             num_check=$(/usr/bin/perl /home/dao_ops/bin/tick ${YEAR_TABLE}${DAY_TABLE[$mm-1]})
             check_num=$(echo $num_check | cut -c 7-8)
@@ -413,39 +411,34 @@
                 DAY_TABLE=(31 29 31 30 31 30 31 31 30 31 30 31)
             fi
         fi
-        
+
         export DAYS_IN_MONTH=${DAY_TABLE[$mm-1]}
         export INSTRUMENT_TABLE=conv
-        
-        # Calculate array size: days * 4 synoptic times
-        hourly_array_size=$((DAYS_IN_MONTH * 4))
-        
-        echo "Submitting hourly array job for $YEAR_TABLE (${DAYS_IN_MONTH} days, array size: ${hourly_array_size})"
-        
-        SLURM_LOG_DIR=${CYLC_TASK_LOG_ROOT}
-        
-        # Submit the array job and wait for completion
-        hourly_job=$(sbatch --parsable \
-            --array=1-${hourly_array_size}%15 \
-            -t 02:00:00 \
-            -J ${YEAR_TABLE}.conv.hourly \
-            -o ${SLURM_LOG_DIR}/conv.hourly.%A_%a.log \
-            --export=YEAR_TABLE=${YEAR_TABLE},INSTRUMENT_TABLE=conv,YYYY=${YYYY},MM=${MM},DAYS_IN_MONTH=${DAYS_IN_MONTH},HOST_DIR=${HOST_DIR},STORAGE_DIR=${STORAGE_DIR},ExpID=${ExpID},JOB_LOG_DIR=${SLURM_LOG_DIR} \
-            --nodes=1 \
-            --ntasks-per-node=1 \
-            --cpus-per-task=1 \
-            ${SCRIPT_DIR}/combine_hourly_conv_array.j)
-        
-        echo "Submitted array job: $hourly_job"
-        
-        # Wait for array job to complete
-        while squeue -j $hourly_job >/dev/null 2>&1; do
-            sleep 30
-        done
-        
-        echo "Hourly array job completed: $hourly_job"
+
+        # Calculate day and synop from SLURM array task ID
+        SYNOP_COUNT=4
+        DAY=$(( ((${SLURM_ARRAY_TASK_ID} - 1) / ${SYNOP_COUNT}) + 1 ))
+        SYNOP_INDEX=$(( (${SLURM_ARRAY_TASK_ID} - 1) % ${SYNOP_COUNT} ))
+        SYNOP_VALUES=(00 06 12 18)
+        SYNOP_TABLE=${SYNOP_VALUES[$SYNOP_INDEX]}
+
+        DD=$(printf "%02d" $DAY)
+        NYMD=${YEAR_TABLE}${DD}
+
+        export IN_DIR=${HOST_DIR}/conv/d/Y${YYYY}/M${MM}/D${DD}
+        export OUT_DIR=${STORAGE_DIR}/conv/d/Y${YYYY}/M${MM}/D${DD}
+        mkdir -p ${OUT_DIR}
+
+        echo "Processing array task ${SLURM_ARRAY_TASK_ID}: Day ${DD}, Synop ${SYNOP_TABLE}"
+
+        /usr/bin/csh ${SCRIPT_DIR}/combine_hourly_conv_output.j ${NYMD} ${SYNOP_TABLE}
         """
-        
+
         [[[job]]]
             batch system = slurm
             execution time limit = PT4H
+        [[[directives]]]
+            --nodes = 1
+            --ntasks-per-node = 1
+            --cpus-per-task = 1
+            --array = 1-124%15
