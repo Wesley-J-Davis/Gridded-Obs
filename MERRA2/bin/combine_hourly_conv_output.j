@@ -137,7 +137,7 @@ foreach HOUR ( `echo $SYNOP_TABLE` )
         endif
         
         if ($MODE == "nobs" ) then
-            set  LONGNAME = `${RC_DIR}/get_conv_longname.csh $FIELDO ${MODE}`
+            set  LONGNAME = `${RootDir}/bin/get_conv_longname.csh $FIELDO ${MODE}`
             echo $FIELDO  $LONGNAME
             time ncatted -h -O -a comments,$FIELDO,o,c,"${MODE}"      $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_obs.${NYMD}${SYNOP}.nc4
             time ncatted -h -O -a long_name,$FIELDO,o,c,"$LONGNAME"   $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_obs.${NYMD}${SYNOP}.nc4
