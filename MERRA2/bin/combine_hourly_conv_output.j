@@ -22,12 +22,12 @@ echo $prod_date
 
 unset argv
 setenv argv
-#set RootDir = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS
+set RootDir = /home/dao_ops/operations/GIT-OPS/Gridded-Obs/MERRA2
 #set BinDir  = ${RootDir}/GrITAS/Linux/bin
 #source $BinDir/g5_modules
 module load nco
-set RC_DIR      = ${RootDir}/GrITAS/src/Components/gritas/GIO
-set RC_DIR      = /home/dao_ops/operations/GIT-OPS/Gridded-Obs/MERRA2/etc
+#set RC_DIR      = ${RootDir}/GrITAS/src/Components/gritas/GIO
+set RC_DIR      = ${RootDir}/etc
 set argv = ( $TEMP_argv )
 
 #set SYNOP_TABLE = ( 00 06 12 18 )
@@ -322,7 +322,7 @@ foreach HOUR ( `echo $SYNOP_TABLE` )
             -a calendar,time,o,c,"standard" \
             -a units,time,o,c,"minutes since ${CurrentMonth_FirstDay} ${HOUR0}:00:00"
 
-	     ${RC_DIR}/run_n4zip.csh $granule
+	     ${RootDir}/bin/run_n4zip.csh $granule
     endif   # skipping meta data
     echo " ----------------------------"
     echo "      $SYNOP  TIME           "

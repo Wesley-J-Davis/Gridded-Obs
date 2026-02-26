@@ -17,7 +17,7 @@ set RC_DIR      = /home/dao_ops/operations/GIT-OPS/Gridded-Obs/MERRA2/etc/
 set HOST_DIR    = /discover/nobackup/projects/gmao/merra2/data/obs/.WORK/work_dir_wjd
 
 set YEAR_TABLE = $1
-#set SYNOP_TABLE = $2
+set SYNOP_TABLE = $2
 #set HOST_DIR     = $2
 #set STORAGE_DIR  = $3
 
@@ -31,8 +31,8 @@ unset argv
 setenv argv
 set argv = ( $TEMP_argv )
 # all 00 06 12 18
-set SYNOP_TABLE = ( 00 06 12 18 all )
-#set INSTRUMENT_TABLE = 'conv'
+#set SYNOP_TABLE = ( 00 06 12 18 all )
+set INSTRUMENT_TABLE = 'conv'
 set METADATA_TABLE = ${RC_DIR}/metadata.tbl
 set PRODUCT_TABLE  = ${RC_DIR}/M2_OPS_product_table.csv
 set OBRATE_TABLE   = ${RC_DIR}/obrate_conv_product_table.csv
