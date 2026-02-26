@@ -17,9 +17,8 @@
                 
                 process_synop_00 & process_synop_06 & process_synop_12 & process_synop_18 => metric_obrate & metric_means & metric_rms
                 
-                metric_obrate & metric_means & metric_rms => combine_synop_00 & combine_synop_06 & combine_synop_12 & combine_synop_18
+                metric_obrate & metric_means & metric_rms => combine_job & hourly_jobs
                 
-                combine_synop_00 & combine_synop_06 & combine_synop_12 & combine_synop_18 => combine_all_synop & hourly_jobs
             """
 
 [runtime]
@@ -30,14 +29,14 @@
             SCRIPT_DIR = /home/dao_ops/operations/GIT-OPS/Gridded-Obs/MERRA2/bin
             BIN_DIR = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS/GrITAS/Linux/bin
 
-    [[move_synop]]
+    [[move_synop_00]]
         script = """
         set echo
         
         cd ${SCRIPT_DIR}
         
         # Extract synoptic time from cycle point (YYYYMMDDHH)
-        SYNOP=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 10-11)
+        SYNOP="00"
         YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
         YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
         
@@ -57,11 +56,92 @@
         # Execute the move script with synoptic time as argument
         ${SCRIPT_DIR}/move_conventionals.j $YEAR_TABLE $SYNOP $ExpID
         """
-        
-    [[move_synop_00, move_synop_06, move_synop_12, move_synop_18]]
-        inherit = move_synop
 
-    [[process_synop]]
+    [[move_synop_06]]
+        script = """
+        set echo
+
+        cd ${SCRIPT_DIR}
+
+        # Extract synoptic time from cycle point (YYYYMMDDHH)
+        SYNOP="06"
+        YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
+        YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
+
+        # Determine ExpID based on year
+        if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
+            export ExpID=d5124_m2_jan79
+        elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
+            export ExpID=d5124_m2_jan91
+        elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
+            export ExpID=d5124_m2_jan00
+        elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
+            export ExpID=d5124_m2_jan10
+        fi
+
+        echo "Processing synoptic time: $SYNOP for $YEAR_TABLE"
+
+        # Execute the move script with synoptic time as argument
+        ${SCRIPT_DIR}/move_conventionals.j $YEAR_TABLE $SYNOP $ExpID
+        """ 
+
+    [[move_synop_12]]
+        script = """
+        set echo
+
+        cd ${SCRIPT_DIR}
+
+        # Extract synoptic time from cycle point (YYYYMMDDHH)
+        SYNOP="12"
+        YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
+        YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
+
+        # Determine ExpID based on year
+        if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
+            export ExpID=d5124_m2_jan79
+        elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
+            export ExpID=d5124_m2_jan91
+        elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
+            export ExpID=d5124_m2_jan00
+        elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
+            export ExpID=d5124_m2_jan10
+        fi
+
+        echo "Processing synoptic time: $SYNOP for $YEAR_TABLE"
+
+        # Execute the move script with synoptic time as argument
+        ${SCRIPT_DIR}/move_conventionals.j $YEAR_TABLE $SYNOP $ExpID
+        """   
+
+    [[move_synop_18]]
+        script = """
+        set echo
+
+        cd ${SCRIPT_DIR}
+
+        # Extract synoptic time from cycle point (YYYYMMDDHH)
+        SYNOP="18"
+        YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
+        YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
+
+        # Determine ExpID based on year
+        if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
+            export ExpID=d5124_m2_jan79
+        elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
+            export ExpID=d5124_m2_jan91
+        elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
+            export ExpID=d5124_m2_jan00
+        elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
+            export ExpID=d5124_m2_jan10
+        fi
+
+        echo "Processing synoptic time: $SYNOP for $YEAR_TABLE"
+
+        # Execute the move script with synoptic time as argument
+        ${SCRIPT_DIR}/move_conventionals.j $YEAR_TABLE $SYNOP $ExpID
+        """
+
+    [[process_synop_00]]
         pre-script = "source $BIN_DIR/.g5_modules.sh; module load nco"
         script = """
         
@@ -70,7 +150,7 @@
         cd ${SCRIPT_DIR}
         
         # Extract synoptic time and date info
-        SYNOP=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 10-11)
+        SYNOP="00"
         YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
         YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
         
@@ -97,8 +177,113 @@
         [[[directives]]]
             --export = ALL
 
-    [[process_synop_00, process_synop_06, process_synop_12, process_synop_18]]
-        inherit = process_synop
+    [[process_synop_06]]
+        pre-script = "source $BIN_DIR/.g5_modules.sh; module load nco"
+        script = """
+
+        set echo
+
+        cd ${SCRIPT_DIR}
+
+        # Extract synoptic time and date info
+        SYNOP="06"
+        YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
+        YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
+
+        # Determine ExpID
+        if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
+            export ExpID=d5124_m2_jan79
+        elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
+            export ExpID=d5124_m2_jan91
+        elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
+            export ExpID=d5124_m2_jan00
+        elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
+            export ExpID=d5124_m2_jan10
+        fi
+
+        echo "Processing synoptic time: $SYNOP for $YEAR_TABLE"
+
+        # Execute the process script with synoptic time as argument
+        ${SCRIPT_DIR}/process_gritas_conventionals.j $YEAR_TABLE $SYNOP $ExpID
+        """
+
+        [[[job]]]
+            batch system = slurm
+            execution time limit = PT1H
+        [[[directives]]]
+            --export = ALL
+
+    [[process_synop_12]]
+        pre-script = "source $BIN_DIR/.g5_modules.sh; module load nco"
+        script = """
+
+        set echo
+
+        cd ${SCRIPT_DIR}
+
+        # Extract synoptic time and date info
+        SYNOP="12"
+        YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
+        YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
+
+        # Determine ExpID
+        if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
+            export ExpID=d5124_m2_jan79
+        elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
+            export ExpID=d5124_m2_jan91
+        elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
+            export ExpID=d5124_m2_jan00
+        elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
+            export ExpID=d5124_m2_jan10
+        fi
+
+        echo "Processing synoptic time: $SYNOP for $YEAR_TABLE"
+
+        # Execute the process script with synoptic time as argument
+        ${SCRIPT_DIR}/process_gritas_conventionals.j $YEAR_TABLE $SYNOP $ExpID
+        """
+
+        [[[job]]]
+            batch system = slurm
+            execution time limit = PT1H
+        [[[directives]]]
+            --export = ALL
+
+    [[process_synop_18]]
+        pre-script = "source $BIN_DIR/.g5_modules.sh; module load nco"
+        script = """
+
+        set echo
+
+        cd ${SCRIPT_DIR}
+
+        # Extract synoptic time and date info
+        SYNOP="18"
+        YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
+        YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
+
+        # Determine ExpID
+        if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
+            export ExpID=d5124_m2_jan79
+        elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
+            export ExpID=d5124_m2_jan91
+        elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
+            export ExpID=d5124_m2_jan00
+        elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
+            export ExpID=d5124_m2_jan10
+        fi
+
+        echo "Processing synoptic time: $SYNOP for $YEAR_TABLE"
+
+        # Execute the process script with synoptic time as argument
+        ${SCRIPT_DIR}/process_gritas_conventionals.j $YEAR_TABLE $SYNOP $ExpID
+        """
+
+        [[[job]]]
+            batch system = slurm
+            execution time limit = PT1H
+        [[[directives]]]
+            --export = ALL
 
 [[metric_obrate]]
         pre-script = "source $BIN_DIR/.g5_modules.sh"
@@ -160,7 +345,7 @@
         [[[directives]]]
             --export = ALL
 
-    [[combine_synop]]
+    [[combine_job]]
         script = """
         set -e
         set -x
@@ -168,7 +353,7 @@
         cd ${SCRIPT_DIR}
         
         # Extract synoptic time and date info
-        SYNOP=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 10-11)
+        SYNOP="00"
         YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
         YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
         
@@ -186,7 +371,7 @@
         echo "Combining synoptic time: $SYNOP for $YEAR_TABLE"
         
         # Execute the combine script with synoptic time as argument
-        ${SCRIPT_DIR}/combine_conv_output.j $YEAR_TABLE $SYNOP
+        ${SCRIPT_DIR}/combine_conv_output.j $YEAR_TABLE
         """
         
         [[[job]]]
@@ -194,44 +379,6 @@
             execution time limit = PT1H
         [[[directives]]]
             export = ALL
-
-    [[combine_synop_00, combine_synop_06, combine_synop_12, combine_synop_18]]
-        inherit = combine_synop
-
-    [[combine_all_synop]]
-        script = """
-        set -e
-        set -x
-        
-        cd ${SCRIPT_DIR}
-        
-        YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
-        YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
-        
-        # Determine ExpID
-        if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
-            export ExpID=d5124_m2_jan79
-        elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
-            export ExpID=d5124_m2_jan91
-        elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
-            export ExpID=d5124_m2_jan00
-        elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
-            export ExpID=d5124_m2_jan10
-        fi
-        
-        echo "Combining all synoptic times for $YEAR_TABLE"
-        
-        # Execute the combine script with "all" argument
-        ${SCRIPT_DIR}/combine_conv_output.j $YEAR_TABLE all
-        """
-        
-        [[[job]]]
-            batch system = slurm
-            execution time limit = PT1H
-        [[[directives]]]
-            --nodes = 1
-            --ntasks-per-node = 1
-            --cpus-per-task = 1
 
     [[hourly_jobs]]
         script = """
