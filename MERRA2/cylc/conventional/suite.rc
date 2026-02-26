@@ -564,7 +564,7 @@
 
         echo "Processing array task ${SLURM_ARRAY_TASK_ID}: Day ${DD}, Synop ${SYNOP_TABLE}"
 
-        /usr/bin/csh ${SCRIPT_DIR}/combine_hourly_conv_output.j ${NYMD} ${SYNOP_TABLE}
+        /usr/bin/csh ${SCRIPT_DIR}/combine_hourly_conv_output.j ${NYMD} ${SYNOP_TABLE} > ${CYLC_TASK_WORK_DIR}/${NYMD}.${SYNOP_TABLE}.log 2>&1
         """
 
         [[[job]]]

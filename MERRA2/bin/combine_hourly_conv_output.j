@@ -18,7 +18,7 @@ set TEMP_argv =  ( $argv )
 
 set prod_date = `date -u "+%Y-%m-%dT%TZ"`
 echo $prod_date
-
+/bin/rm $OUT_DIR/*pid*
 
 unset argv
 setenv argv
