@@ -11,14 +11,15 @@ umask 022
 limit stacksize unlimited
 
 # Set MPI environment variables
-#setenv OMPI_MCA_btl_vader_single_copy_mechanism none
-#setenv OMPI_MCA_btl ^openib     # Disable InfiniBand if not available
+setenv OMPI_MCA_btl_vader_single_copy_mechanism none
+setenv OMPI_MCA_btl ^openib     # Disable InfiniBand if not available
 
 #set BinDir =  /home/dao_ops/operations/M2_GRITAS/GrITAS/Linux/bin
-#set BinDir = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS/GrITAS/Linux/bin
+set BinDir = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS/GrITAS/Linux/bin
 #set BinDir = $BIN_DIR
 #source $BinDir/g5_modules
-set echo
+#module load nco
+echo "BASEDIR = $BASEDIR"
 setenv TAG   merra2
 
 set YEAR_TABLE = $1 
@@ -36,7 +37,7 @@ set WorkRootDir  =  /discover/nobackup/projects/gmao/merra2/data/obs/.WORK
 set Storage_Base =  $WorkRootDir/work_dir_wjd/conv/$RES
 set Work_Base	 =  $WorkRootDir/raw_obs_wjd/conv
 
-set n4zip_file   = ${RC_DIR}/n4zip.csh
+set n4zip_file   = /home/dao_ops/operations/GIT-OPS/Gridded-Obs/MERRA2/bin/n4zip.csh
 
 echo " BinDir   $BinDir"
 echo " RC_DIR   $RC_DIR"
@@ -121,8 +122,9 @@ foreach YYYYMM ( `echo $YEAR_TABLE` )
                         #mpirun -np $SLURM_NTASKS 
 			$gritas -oma -o $out_filea $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr &
       wait
-      # clean the work dir for that day of any pre-existing temp files for that synoptic time
-      /bin/rm ${DayDir}/*${Hour}z*nc4*pid*.tmp
+      # clean the work dir for that day of any pre-existing files for that synoptic time
+      /bin/rm -f ${DayDir}/*${Hour}z*nc4*pid*.tmp
+      /bin/rm -f ${DayDir}/*${Hour}z*.nc4 
 
       mv ${out_fileo}.bias.hdf ${DayDir}/$TAG.mean3d_obs_p.${Date}_${Hour}z.nc4
       mv ${out_fileo}.stdv.hdf ${DayDir}/$TAG.stdv3d_obs_p.${Date}_${Hour}z.nc4

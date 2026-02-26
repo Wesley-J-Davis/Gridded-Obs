@@ -8,8 +8,8 @@
 set echo
 
 setenv TAG  merra2
-set BinDir  = /home/dao_ops/operations/M2_GRITAS/GrITAS/Linux/bin
-source $BinDir/g5_modules
+#set BinDir  = /home/dao_ops/operations/M2_GRITAS/GrITAS/Linux/bin
+#source $BinDir/g5_modules
 module load nco
 
 set STORAGE_DIR = /discover/nobackup/projects/gmao/merra2/data/obs/.WORK/products_revised
@@ -17,6 +17,7 @@ set RC_DIR      = /home/dao_ops/operations/GIT-OPS/Gridded-Obs/MERRA2/etc/
 set HOST_DIR    = /discover/nobackup/projects/gmao/merra2/data/obs/.WORK/work_dir_wjd
 
 set YEAR_TABLE = $1
+#set SYNOP_TABLE = $2
 #set HOST_DIR     = $2
 #set STORAGE_DIR  = $3
 

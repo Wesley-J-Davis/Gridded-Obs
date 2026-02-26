@@ -9,7 +9,7 @@ set echo
 set YEAR_TABLE = $1
 set SYNOP = $2
 set ExpID = $3
-
+set INSTRUMENT_TABLE = "conv"
 set YYYY = `echo $YEAR_TABLE | cut -c 1-4`
 
 set WORK_DIR   = /discover/nobackup/projects/gmao/merra2/data/obs/.WORK/raw_obs_wjd
