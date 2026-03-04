@@ -31,6 +31,12 @@ foreach Date ( `echo $YEAR_TABLE` )
                 foreach Hour ( $SYNOP  )
                         set ods_Files = `ls -1 $OBS_DIR/Y$YYYY/M$MM/D*/H${Hour}/*${INSTRUMENT}*`                   # d5124_m2_jan10.diag_conv.20180101_00z.ods
                         echo $ods_Files
+                        # Check if ods_Files is empty
+                        if ( "$ods_Files" == "" ) then
+                                echo "ERROR: No files found for instrument $INSTRUMENT on $Date at hour $Hour"
+                                echo "Search path: $OBS_DIR/Y$YYYY/M$MM/D*/H${Hour}/*${INSTRUMENT}*"
+                                exit 1   # continue  # Skip to next iteration, or use 'exit 1' to stop script
+                        endif
                         foreach FILE ( $ods_Files )
                                 echo $FILE
 				#dmget $FILE
