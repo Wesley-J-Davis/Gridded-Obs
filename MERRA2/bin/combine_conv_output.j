@@ -171,7 +171,7 @@ foreach INSTRUMENT ( `echo $INSTRUMENT_TABLE` )
               /bin/rm $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_obs.${YYYY}${MM}${SYNOP}.nc4
             endif
           end    #MODE
-          foreach FILE ( `/bin/ls -1 $OUT_DIR/*${SYNOP}.nc4` )
+          foreach FILE ( `/bin/ls -1 $OUT_DIR/*${YYYY}${MM}${SYNOP}.nc4` )
             foreach FIELD ( `cat ${RC_DIR}/CONV_FINAL_TABLE.csv` )       
               set LABEL = `grep $FIELD -w ${RC_DIR}/longname_conv_product_table.csv | cut -d, -f2`
               set UNITS = `grep $FIELD -w ${RC_DIR}/longname_conv_product_table.csv | cut -d, -f3`
