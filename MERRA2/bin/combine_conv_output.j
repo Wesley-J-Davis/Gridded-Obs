@@ -171,7 +171,7 @@ foreach INSTRUMENT ( `echo $INSTRUMENT_TABLE` )
               /bin/rm $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_obs.${YYYY}${MM}${SYNOP}.nc4
             endif
           end    #MODE
-          foreach FILE ( `/bin/ls -1 $OUT_DIR/*${SYNOP}.nc4` )
+          foreach FILE ( `/bin/ls -1 $OUT_DIR/*${YYYY}${MM}${SYNOP}.nc4` )
             foreach FIELD ( `cat ${RC_DIR}/CONV_FINAL_TABLE.csv` )       
               set LABEL = `grep $FIELD -w ${RC_DIR}/longname_conv_product_table.csv | cut -d, -f2`
               set UNITS = `grep $FIELD -w ${RC_DIR}/longname_conv_product_table.csv | cut -d, -f3`
@@ -324,6 +324,8 @@ foreach INSTRUMENT ( `echo $INSTRUMENT_TABLE` )
               -a calendar,time,o,c,"standard" \
               -a units,time,o,c,"minutes since ${CurrentMonth_FirstDay} ${HOUR0}:00:00"
             /home/dao_ops/operations/GIT-OPS/Gridded-Obs/MERRA2/bin/run_n4zip.csh $granule
+            chmod 644 $granule
+
           endif   # skipping meta data
           echo " ----------------------------"
           echo "      $SYNOP  TIME           "

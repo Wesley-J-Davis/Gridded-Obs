@@ -361,6 +361,7 @@ foreach INSTRUMENT ( `echo $INSTRUMENT_TABLE` )
 #								exit
 #							endif
 							${RC_DIR}/n4zip.csh $granule
+                                                        chmod 644 $granule
 
                                                         echo " ----------------------------"
                                                         echo "      $SYNOP  TIME           "
