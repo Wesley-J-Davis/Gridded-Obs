@@ -324,6 +324,8 @@ foreach INSTRUMENT ( `echo $INSTRUMENT_TABLE` )
               -a calendar,time,o,c,"standard" \
               -a units,time,o,c,"minutes since ${CurrentMonth_FirstDay} ${HOUR0}:00:00"
             /home/dao_ops/operations/GIT-OPS/Gridded-Obs/MERRA2/bin/run_n4zip.csh $granule
+            chmod 644 $granule
+
           endif   # skipping meta data
           echo " ----------------------------"
           echo "      $SYNOP  TIME           "

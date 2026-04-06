@@ -113,14 +113,14 @@ foreach YYYYMM ( `echo $YEAR_TABLE` )
       
       set out_filea   = gritasa${Hour}
       /bin/rm -f ${out_filea}.{bias,stdv,nobs}.hdf
-
+                        ## THIS ONE NEEDS TO BE OMF, DON'T CHANGE TO OMA
                         # Print MPI and resource information
                         #echo "Starting MPI statistical calculations at `date`"
                         #echo "Number of MPI processes: $SLURM_NTASKS"
                         #echo "Processes per node: $SLURM_NTASKS_PER_NODE"
                         #echo "Available memory: `free -h`"
                         #mpirun -np $SLURM_NTASKS 
-			$gritas -oma -o $out_filea $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr &
+			$gritas -omf -o $out_filea $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr &
       wait
       # clean the work dir for that day of any pre-existing files for that synoptic time
       /bin/rm -f ${DayDir}/*${Hour}z*nc4*pid*.tmp

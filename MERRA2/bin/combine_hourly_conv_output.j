@@ -175,7 +175,7 @@ foreach HOUR ( `echo $SYNOP_TABLE` )
             ncatted -h  -a units,$FIELD,o,c,"$UNITS" $FILE
             ncatted -h  -a vmin,$FIELD,o,c,"$min" $FILE
             ncatted -h  -a vmax,$FIELD,o,c,"$max" $FILE
-            ncatted -h -O -a _FillValue,$FIELD,c,c,"1.e+15f" $FILE
+            ncatted -h -O -a _FillValue,$FIELD,o,f,"1.e+15f" $FILE
             ncatted -h -O -a fmissing_value,$FIELD,d,,   $FILE
             ncatted -h -O -a missing_value,$FIELD,d,,    $FILE
             ncatted -h -O -a eulaVlliF_,$FIELD,d,,       $FILE
@@ -323,6 +323,7 @@ foreach HOUR ( `echo $SYNOP_TABLE` )
             -a units,time,o,c,"minutes since ${CurrentMonth_FirstDay} ${HOUR0}:00:00"
 
 	     ${RootDir}/bin/run_n4zip.csh $granule
+             chmod 644 $granule 
     endif   # skipping meta data
     echo " ----------------------------"
     echo "      $SYNOP  TIME           "
