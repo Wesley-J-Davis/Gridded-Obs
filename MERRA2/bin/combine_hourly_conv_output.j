@@ -5,6 +5,8 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --partition=preops
 
+umask 022
+
 #set IN_DIR     = $1
 #set OUT_DIR    = $2
 set NYMD       = $1
@@ -323,7 +325,6 @@ foreach HOUR ( `echo $SYNOP_TABLE` )
             -a units,time,o,c,"minutes since ${CurrentMonth_FirstDay} ${HOUR0}:00:00"
 
 	     ${RootDir}/bin/run_n4zip.csh $granule
-             chmod 644 $granule 
     endif   # skipping meta data
     echo " ----------------------------"
     echo "      $SYNOP  TIME           "

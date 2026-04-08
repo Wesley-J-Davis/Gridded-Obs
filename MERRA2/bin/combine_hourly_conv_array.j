@@ -31,7 +31,7 @@ export NYMD=${YEAR_TABLE}${DD}
 export IN_DIR=$HOST_DIR/conv/d/Y$YYYY/M$MM/D$DD
 export OUT_DIR=$STORAGE_DIR/conv/d/Y$YYYY/M$MM/D$DD
 mkdir -p $OUT_DIR
-
+chmod 644 $OUT_DIR
 /usr/bin/csh combine_hourly_conv_output.j $NYMD $SYNOP_TABLE > ${JOB_LOG_DIR}/${NYMD}.hourly.${SYNOP_TABLE}.M2hrlycombine 2>&1
 #--array=1-${job_array_size}%20
 #        │  │               |
