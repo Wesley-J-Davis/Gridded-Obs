@@ -3,7 +3,7 @@
     title = "M2 Conv Obs"
 
 [scheduling]
-    initial cycle point = 19800101T00
+    initial cycle point = 19801201T00
     final cycle point = 20240601T00
     runahead limit = P0
 
@@ -561,6 +561,7 @@
         export IN_DIR=${HOST_DIR}/conv/d/Y${YYYY}/M${MM}/D${DD}
         export OUT_DIR=${STORAGE_DIR}/conv/d/Y${YYYY}/M${MM}/D${DD}
         mkdir -p ${OUT_DIR}
+        chmod 755 ${OUT_DIR}
 
         echo "Processing array task ${SLURM_ARRAY_TASK_ID}: Day ${DD}, Synop ${SYNOP_TABLE}"
 
@@ -569,7 +570,7 @@
 
         [[[job]]]
             batch system = slurm
-            execution time limit = PT4H
+            execution time limit = PT15M
         [[[directives]]]
             --nodes = 1
             --ntasks-per-node = 1
