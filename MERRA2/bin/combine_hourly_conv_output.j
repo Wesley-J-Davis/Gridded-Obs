@@ -177,7 +177,7 @@ foreach HOUR ( `echo $SYNOP_TABLE` )
             ncatted -h  -a units,$FIELD,o,c,"$UNITS" $FILE
             ncatted -h  -a vmin,$FIELD,o,c,"$min" $FILE
             ncatted -h  -a vmax,$FIELD,o,c,"$max" $FILE
-            ncatted -h -O -a _FillValue,$FIELD,o,f,"1.e+15f" $FILE
+            ncatted -h -O -a _FillValue,$FIELD,o,f,"1.e+15" $FILE
             ncatted -h -O -a fmissing_value,$FIELD,d,,   $FILE
             ncatted -h -O -a missing_value,$FIELD,d,,    $FILE
             ncatted -h -O -a eulaVlliF_,$FIELD,d,,       $FILE
