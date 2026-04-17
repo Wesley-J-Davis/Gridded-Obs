@@ -72,6 +72,7 @@ foreach INSTRUMENT ( `echo $INSTRUMENT_TABLE` )
       if ($c != 2 ) then
         set OUT_DIR = $STORAGE_DIR/$INSTRUMENT/d/Y$YYYY/M$MM
         mkdir -p $OUT_DIR
+        chmod 755 $STORAGE_DIR/$INSTRUMENT/d/Y$YYYY
         chmod 755 $OUT_DIR
         echo " ----------------------------"
         echo "      STARTING TIME          "
