@@ -10,13 +10,7 @@
     [[dependencies]]
         [[[P1M]]]  # Monthly cycling - runs 4 synoptic times per month
             graph = """
-                move_synop_00 => process_synop_00
-                move_synop_06 => process_synop_06
-                move_synop_12 => process_synop_12
-                move_synop_18 => process_synop_18
-                
-                process_synop_00 & process_synop_06 & process_synop_12 & process_synop_18 => hourly_jobs
-  
+                move_synop_00 & move_synop_06 & move_synop_12 & move_synop_18 => hourly_jobs
             """
 
 [runtime]
@@ -337,8 +331,11 @@
         chmod 755 ${OUT_DIR}
 
         echo "Processing array task ${SLURM_ARRAY_TASK_ID}: ${INSTRUMENT_TABLE}, Day ${DD}, Synop ${SYNOP_TABLE}"
+        /usr/bin/csh ${SCRIPT_DIR}/process_gritas_hourly_radiances.j ${NYMD} ${SYNOP_TABLE} $ExpID ${INSTRUMENT_TABLE} > ${CYLC_TASK_WORK_DIR}/Processing.${NYMD}.${SYNOP_TABLE}.log 2>&1
+        wait
 
-        /usr/bin/csh ${SCRIPT_DIR}/combine_hourly_radiance_output.j ${NYMD} ${SYNOP_TABLE} ${INSTRUMENT_TABLE} > ${CYLC_TASK_WORK_DIR}/${NYMD}.${SYNOP_TABLE}.log 2>&1
+        /usr/bin/csh ${SCRIPT_DIR}/combine_hourly_radiance_output.j ${NYMD} ${SYNOP_TABLE} ${INSTRUMENT_TABLE} > ${CYLC_TASK_WORK_DIR}/Combining.${NYMD}.${SYNOP_TABLE}.log 2>&1
+        wait
         """
 
         [[[job]]]
