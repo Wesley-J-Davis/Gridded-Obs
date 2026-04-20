@@ -1,0 +1,351 @@
+#!Jinja2
+[meta]
+    title = "M2 daily synoptic time radiance processing"
+
+[scheduling]
+    initial cycle point = 19801201T00
+    final cycle point = 20240601T00
+    runahead limit = P0
+
+    [[dependencies]]
+        [[[P1M]]]  # Monthly cycling - runs 4 synoptic times per month
+            graph = """
+                move_synop_00 => process_synop_00
+                move_synop_06 => process_synop_06
+                move_synop_12 => process_synop_12
+                move_synop_18 => process_synop_18
+                
+                process_synop_00 & process_synop_06 & process_synop_12 & process_synop_18 => hourly_jobs
+  
+            """
+
+[runtime]
+    [[root]]
+        [[[environment]]]
+            STORAGE_DIR = /discover/nobackup/projects/gmao/merra2/data/obs/.WORK/products_revised
+            HOST_DIR = /discover/nobackup/projects/gmao/merra2/data/obs/.WORK/work_dir_wjd
+            SCRIPT_DIR = /home/dao_ops/operations/GIT-OPS/Gridded-Obs/MERRA2/bin
+            BIN_DIR = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS/GrITAS/Linux/bin
+            INSTRUMENT_TABLE = airs_aqua
+
+    [[move_synop_00]]
+        script = """
+        set echo
+        
+        cd ${SCRIPT_DIR}
+        
+        # Extract synoptic time from cycle point (YYYYMMDDHH)
+        SYNOP="00"
+        YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
+        YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
+        
+        # Determine ExpID based on year
+        if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
+            export ExpID=d5124_m2_jan79
+        elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
+            export ExpID=d5124_m2_jan91
+        elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
+            export ExpID=d5124_m2_jan00
+        elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
+            export ExpID=d5124_m2_jan10
+        fi
+        
+        echo "Processing synoptic time: $SYNOP for $YEAR_TABLE"
+        
+        # Execute the move script with synoptic time as argument
+        ${SCRIPT_DIR}/move_sat.j $YEAR_TABLE $SYNOP $ExpID
+        """
+
+    [[move_synop_06]]
+        script = """
+        set echo
+
+        cd ${SCRIPT_DIR}
+
+        # Extract synoptic time from cycle point (YYYYMMDDHH)
+        SYNOP="06"
+        YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
+        YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
+
+        # Determine ExpID based on year
+        if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
+            export ExpID=d5124_m2_jan79
+        elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
+            export ExpID=d5124_m2_jan91
+        elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
+            export ExpID=d5124_m2_jan00
+        elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
+            export ExpID=d5124_m2_jan10
+        fi
+
+        echo "Processing synoptic time: $SYNOP for $YEAR_TABLE"
+
+        # Execute the move script with synoptic time as argument
+        ${SCRIPT_DIR}/move_sat.j $YEAR_TABLE $SYNOP $ExpID
+        """ 
+
+    [[move_synop_12]]
+        script = """
+        set echo
+
+        cd ${SCRIPT_DIR}
+
+        # Extract synoptic time from cycle point (YYYYMMDDHH)
+        SYNOP="12"
+        YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
+        YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
+
+        # Determine ExpID based on year
+        if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
+            export ExpID=d5124_m2_jan79
+        elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
+            export ExpID=d5124_m2_jan91
+        elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
+            export ExpID=d5124_m2_jan00
+        elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
+            export ExpID=d5124_m2_jan10
+        fi
+
+        echo "Processing synoptic time: $SYNOP for $YEAR_TABLE"
+
+        # Execute the move script with synoptic time as argument
+        ${SCRIPT_DIR}/move_sat.j $YEAR_TABLE $SYNOP $ExpID
+        """   
+
+    [[move_synop_18]]
+        script = """
+        set echo
+
+        cd ${SCRIPT_DIR}
+
+        # Extract synoptic time from cycle point (YYYYMMDDHH)
+        SYNOP="18"
+        YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
+        YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
+
+        # Determine ExpID based on year
+        if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
+            export ExpID=d5124_m2_jan79
+        elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
+            export ExpID=d5124_m2_jan91
+        elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
+            export ExpID=d5124_m2_jan00
+        elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
+            export ExpID=d5124_m2_jan10
+        fi
+
+        echo "Processing synoptic time: $SYNOP for $YEAR_TABLE"
+
+        # Execute the move script with synoptic time as argument
+        ${SCRIPT_DIR}/move_sat.j $YEAR_TABLE $SYNOP $ExpID 
+        """
+
+    [[process_synop_00]]
+        pre-script = "source $BIN_DIR/.g5_modules.sh; module load nco"
+        script = """
+        
+        set echo
+        
+        cd ${SCRIPT_DIR}
+        
+        # Extract synoptic time and date info
+        SYNOP="00"
+        YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
+        YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
+        
+        # Determine ExpID
+        if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
+            export ExpID=d5124_m2_jan79
+        elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
+            export ExpID=d5124_m2_jan91
+        elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
+            export ExpID=d5124_m2_jan00
+        elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
+            export ExpID=d5124_m2_jan10
+        fi
+        
+        echo "Processing synoptic time: $SYNOP for $YEAR_TABLE"
+        
+        # Execute the process script with synoptic time as argument
+        ${SCRIPT_DIR}/process_gritas_hourly_radiances.j $YEAR_TABLE $SYNOP $ExpID ${INSTRUMENT_TABLE}
+        """
+        
+        [[[job]]]
+            batch system = slurm
+            execution time limit = PT1H
+        [[[directives]]]
+            --export = ALL
+
+    [[process_synop_06]]
+        pre-script = "source $BIN_DIR/.g5_modules.sh; module load nco"
+        script = """
+
+        set echo
+
+        cd ${SCRIPT_DIR}
+
+        # Extract synoptic time and date info
+        SYNOP="06"
+        YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
+        YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
+
+        # Determine ExpID
+        if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
+            export ExpID=d5124_m2_jan79
+        elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
+            export ExpID=d5124_m2_jan91
+        elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
+            export ExpID=d5124_m2_jan00
+        elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
+            export ExpID=d5124_m2_jan10
+        fi
+
+        echo "Processing synoptic time: $SYNOP for $YEAR_TABLE"
+
+        # Execute the process script with synoptic time as argument
+        ${SCRIPT_DIR}/process_gritas_hourly_radiances.j $YEAR_TABLE $SYNOP $ExpID ${INSTRUMENT_TABLE}
+        """
+
+        [[[job]]]
+            batch system = slurm
+            execution time limit = PT1H
+        [[[directives]]]
+            --export = ALL
+
+    [[process_synop_12]]
+        pre-script = "source $BIN_DIR/.g5_modules.sh; module load nco"
+        script = """
+
+        set echo
+
+        cd ${SCRIPT_DIR}
+
+        # Extract synoptic time and date info
+        SYNOP="12"
+        YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
+        YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
+
+        # Determine ExpID
+        if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
+            export ExpID=d5124_m2_jan79
+        elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
+            export ExpID=d5124_m2_jan91
+        elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
+            export ExpID=d5124_m2_jan00
+        elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
+            export ExpID=d5124_m2_jan10
+        fi
+
+        echo "Processing synoptic time: $SYNOP for $YEAR_TABLE"
+
+        # Execute the process script with synoptic time as argument
+        ${SCRIPT_DIR}/process_gritas_hourly_radiances.j $YEAR_TABLE $SYNOP $ExpID ${INSTRUMENT_TABLE}
+        """
+
+        [[[job]]]
+            batch system = slurm
+            execution time limit = PT1H
+        [[[directives]]]
+            --export = ALL
+
+    [[process_synop_18]]
+        pre-script = "source $BIN_DIR/.g5_modules.sh; module load nco"
+        script = """
+
+        set echo
+
+        cd ${SCRIPT_DIR}
+
+        # Extract synoptic time and date info
+        SYNOP="18"
+        YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
+        YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
+
+        # Determine ExpID
+        if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
+            export ExpID=d5124_m2_jan79
+        elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
+            export ExpID=d5124_m2_jan91
+        elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
+            export ExpID=d5124_m2_jan00
+        elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
+            export ExpID=d5124_m2_jan10
+        fi
+
+        echo "Processing synoptic time: $SYNOP for $YEAR_TABLE"
+
+        # Execute the process script with synoptic time as argument
+        ${SCRIPT_DIR}/process_gritas_hourly_radiances.j $YEAR_TABLE $SYNOP $ExpID ${INSTRUMENT_TABLE}
+        """
+
+        [[[job]]]
+            batch system = slurm
+            execution time limit = PT1H
+        [[[directives]]]
+            --export = ALL
+
+[[hourly_jobs]]
+        script = """
+        set -e
+        set -x
+
+        cd ${SCRIPT_DIR}
+
+        YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
+        YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
+        MM=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 5-6)
+        mm=$((10#$MM))
+
+        # Determine ExpID
+        if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
+            export ExpID=d5124_m2_jan79
+        elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
+            export ExpID=d5124_m2_jan91
+        elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
+            export ExpID=d5124_m2_jan00
+        elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
+            export ExpID=d5124_m2_jan10
+        fi
+
+        # Calculate days in month
+        DAY_TABLE=(31 28 31 30 31 30 31 31 30 31 30 31)
+
+        if [ "$MM" == "02" ]; then
+            num_check=$(/usr/bin/perl /home/dao_ops/bin/tick ${YEAR_TABLE}${DAY_TABLE[$mm-1]})
+            check_num=$(echo $num_check | cut -c 7-8)
+            if [ "$check_num" == "29" ]; then
+                DAY_TABLE=(31 29 31 30 31 30 31 31 30 31 30 31)
+            fi
+        fi
+
+        export DAYS_IN_MONTH=${DAY_TABLE[$mm-1]}
+        export INSTRUMENT_TABLE_TABLE=${INSTRUMENT_TABLE}
+
+        # Calculate day and synop from SLURM array task ID
+        SYNOP_COUNT=4
+        DAY=$(( ((${SLURM_ARRAY_TASK_ID} - 1) / ${SYNOP_COUNT}) + 1 ))
+        SYNOP_INDEX=$(( (${SLURM_ARRAY_TASK_ID} - 1) % ${SYNOP_COUNT} ))
+        SYNOP_VALUES=(00 06 12 18)
+        SYNOP_TABLE=${SYNOP_VALUES[$SYNOP_INDEX]}
+
+        DD=$(printf "%02d" $DAY)
+        NYMD=${YEAR_TABLE}${DD}
+
+        export IN_DIR=${HOST_DIR}/${INSTRUMENT_TABLE}/d/Y${YYYY}/M${MM}/D${DD}
+        export OUT_DIR=${STORAGE_DIR}/${INSTRUMENT_TABLE}/d/Y${YYYY}/M${MM}/D${DD}
+        mkdir -p ${OUT_DIR}
+        chmod 755 ${OUT_DIR}
+
+        echo "Processing array task ${SLURM_ARRAY_TASK_ID}: ${INSTRUMENT_TABLE}, Day ${DD}, Synop ${SYNOP_TABLE}"
+
+        /usr/bin/csh ${SCRIPT_DIR}/combine_hourly_radiance_output.j ${NYMD} ${SYNOP_TABLE} ${INSTRUMENT_TABLE} > ${CYLC_TASK_WORK_DIR}/${NYMD}.${SYNOP_TABLE}.log 2>&1
+        """
+
+        [[[job]]]
+            batch system = slurm
+            execution time limit = PT45M
+        [[[directives]]]
+            --nodes = 1
+            --ntasks-per-node = 1
+            --cpus-per-task = 1
+            --array = 1-124%15
