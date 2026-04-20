@@ -1,17 +1,14 @@
 #!/bin/csh 
 
-#SBATCH --time=0:30:00
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
 #SBATCH --partition=preops
-
+module load nco
 umask 022
 
 #set IN_DIR     = $1
 #set OUT_DIR    = $2
 set NYMD       = $1
 set SYNOP_TABLE = $2
-set INSTRUMENT = conv
+set INSTRUMENT = $3
 set skip = 0
 set YYYY = `echo $NYMD | cut -c1-4`
 set   MM = `echo $NYMD | cut -c5-6`
@@ -20,27 +17,15 @@ set TEMP_argv =  ( $argv )
 
 set prod_date = `date -u "+%Y-%m-%dT%TZ"`
 echo $prod_date
-/bin/rm $OUT_DIR/*pid*
+/bin/rm -f $OUT_DIR/*pid*
 
-unset argv
-setenv argv
 set RootDir = /home/dao_ops/operations/GIT-OPS/Gridded-Obs/MERRA2
-#set BinDir  = ${RootDir}/GrITAS/Linux/bin
-#source $BinDir/g5_modules
-module load nco
-#set RC_DIR      = ${RootDir}/GrITAS/src/Components/gritas/GIO
 set RC_DIR      = ${RootDir}/etc
-set argv = ( $TEMP_argv )
-
-#set SYNOP_TABLE = ( 00 06 12 18 )
+set WAVELENGTH_TABLES = ${RC_DIR}/WAVELENGTH_TABLES
 
 set METADATA_TABLE = ${RC_DIR}/metadata.tbl
 set PRODUCT_TABLE  = ${RC_DIR}/M2_OPS_hourly_product_table.csv
-set OBRATE_TABLE   = ${RC_DIR}/obrate_conv_product_table.csv
 
-set YYYY = `echo $NYMD | cut -c1-4`
-set   MM = `echo $NYMD | cut -c5-6`
-#NYMD=YYYYMMDD
 set CurrentMonth_FirstDay  = ${YYYY}${MM}01
 set PreviousMonth_LastDay = `/usr/bin/perl /home/dao_ops/bin/tick ${CurrentMonth_FirstDay} 000000 -1 0 | cut -d' ' -f1`
 set NextMonth             = `/usr/bin/perl /home/dao_ops/bin/tick ${CurrentMonth_FirstDay} 000000  32 0 | cut -d' ' -f1 | cut -c1-6`
@@ -70,120 +55,42 @@ foreach HOUR ( `echo $SYNOP_TABLE` )
     endif
     set kount = 0
     
+    set file  = merra2.${INSTRUMENT}.${YYYY}${MM}${SYNOP}.nc4
+    
     foreach MODE ( mean nobs stdv )
-        set flag = 0
-        set kount = 0
-        #         echo " MODE: $MODE TIME: $HOUR"
-        foreach FIELD ( `cat ${RC_DIR}/CONV_FIELD_TABLE` )       
-            if ( $MODE == "mean" ) then
-                set FIELDO =  $FIELD 
-                set FIELDF = "${FIELD}_omf"
-                set FIELDA = "${FIELD}_oma"
-            else if ( $MODE == "nobs" ) then
-                set FIELDO = "${FIELD}_${MODE}"
-                set FIELDF = "${FIELD}_${MODE}_omf"
-                set FIELDA = "${FIELD}_${MODE}_oma"
-            else if ( $MODE == "stdv" ) then
-                set FIELDO = "${FIELD}_${MODE}"
-                set FIELDF = "${FIELD}_${MODE}_omf"
-                set FIELDA = "${FIELD}_${MODE}_oma"
-            endif
-            #           echo "flag: $flag"
-            if ( $flag == 0 ) then
-                if ( $MODE != "mean" ) then
-                    time ncrename -h -v ${FIELD},${FIELDO} $IN_DIR/merra2.${MODE}3d_obs_p.${NYMD}${SYNOP}.nc4 -o $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_obs.${NYMD}${SYNOP}.nc4
-                    time ncatted -h -O -a comments,$FIELDO,o,c,"${MODE}"   $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_obs.${NYMD}${SYNOP}.nc4
-                else
-                    echo $FIELDO
-                    #        time $NCKS -h $IN_DIR/merra2.mon_${MODE}_obs.${YYYY}${MM}${SYNOP}.nc4 $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_obs.${YYYY}${MM}${SYNOP}.nc4
-                    cp  $IN_DIR/merra2.${MODE}3d_obs_p.${NYMD}${SYNOP}.nc4 $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_obs.${NYMD}${SYNOP}.nc4
-                    time ncatted -h -O -a comments,$FIELDO,o,c,"means"   $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_obs.${NYMD}${SYNOP}.nc4
-                endif
-        
-                if ( $MODE != "nobs" ) then
-                    echo $FIELD $FIELDF $FIELDA
-                    time ncrename -h -v ${FIELD},${FIELDF} $IN_DIR/merra2.${MODE}3d_omf_p.${NYMD}${SYNOP}.nc4 -o $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_omf.${NYMD}${SYNOP}.nc4
-                    time ncrename -h -v ${FIELD},${FIELDA} $IN_DIR/merra2.${MODE}3d_oma_p.${NYMD}${SYNOP}.nc4 -o $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_oma.${NYMD}${SYNOP}.nc4
-                    
-                    if ( $MODE == "stdv" ) then
-                        time ncatted -h -O -a comments,$FIELDF,o,c,"${MODE}_omf"   $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_omf.${NYMD}${SYNOP}.nc4
-                        time ncatted -h -O -a comments,$FIELDA,o,c,"${MODE}_oma"   $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_oma.${NYMD}${SYNOP}.nc4
-                    else
-                        time ncatted -h -O -a comments,$FIELDF,o,c,"omf"   $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_omf.${NYMD}${SYNOP}.nc4
-                        time ncatted -h -O -a comments,$FIELDA,o,c,"oma"   $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_oma.${NYMD}${SYNOP}.nc4
-                    endif
-                endif
-            else
-            
-            if ( $MODE != "mean" ) then
-                echo $FIELD $FIELDF $FIELDO
-                time ncrename -h -v ${FIELD},${FIELDO} $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_obs.${NYMD}${SYNOP}.nc4
-                time ncatted -h -O -a comments,$FIELDO,o,c,"${MODE}"   $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_obs.${NYMD}${SYNOP}.nc4
-            else
-                time ncatted -h -O -a comments,$FIELDO,o,c,"means"   $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_obs.${NYMD}${SYNOP}.nc4
-            endif
-            
-            if ( $MODE != "nobs" ) then
-                echo $FIELD $FIELDF $FIELDA
-                time ncrename -h -v ${FIELD},${FIELDF} $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_omf.${NYMD}${SYNOP}.nc4
-                time ncrename -h -v ${FIELD},${FIELDA} $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_oma.${NYMD}${SYNOP}.nc4
-                
-                if ( $MODE == "stdv" ) then
-                    time ncatted -h -O -a comments,$FIELDF,o,c,"${MODE}_omf"   $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_omf.${NYMD}${SYNOP}.nc4
-                    time ncatted -h -O -a comments,$FIELDA,o,c,"${MODE}_oma"   $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_oma.${NYMD}${SYNOP}.nc4
-                else
-                    time ncatted -h -O -a comments,$FIELDF,o,c,"omf"   $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_omf.${NYMD}${SYNOP}.nc4
-                    time ncatted -h -O -a comments,$FIELDA,o,c,"oma"   $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_oma.${NYMD}${SYNOP}.nc4
-                endif
-            endif
+        if (  $MODE != "nobs" ) then
+            time ncrename -h -O -v ${FIELD},${MODE}_bias $IN_DIR/merra2.${INSTRUMENT}.${MODE}3d_bias_p.${YYYY}${MM}${SYNOP}.nc4 $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_bias_p.${YYYY}${MM}${SYNOP}.nc4
+            time ncatted -h -O -a comments,,m,c,"bias" $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_bias_p.${YYYY}${MM}${SYNOP}.nc4
+            time ncatted -h -O -a units,${MODE}_bias,m,c,"K" $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_bias_p.${YYYY}${MM}${SYNOP}.nc4
         endif
-        
-        if ($MODE == "nobs" ) then
-            set  LONGNAME = `${RootDir}/bin/get_conv_longname.csh $FIELDO ${MODE}`
-            echo $FIELDO  $LONGNAME
-            time ncatted -h -O -a comments,$FIELDO,o,c,"${MODE}"      $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_obs.${NYMD}${SYNOP}.nc4
-            time ncatted -h -O -a long_name,$FIELDO,o,c,"$LONGNAME"   $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_obs.${NYMD}${SYNOP}.nc4
+
+        time ncrename -h -O -v ${FIELD},${MODE}_obs  $IN_DIR/merra2.${INSTRUMENT}.${MODE}3d_obs_p.${YYYY}${MM}${SYNOP}.nc4 $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_obs_p.${YYYY}${MM}${SYNOP}.nc4
+        time ncatted -h -O -a comments,,m,c,"obs" $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_obs_p.${YYYY}${MM}${SYNOP}.nc4
+        time ncatted -h -O -a units,${MODE}_obs,m,c,"K" $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_obs_p.${YYYY}${MM}${SYNOP}.nc4
+
+        if (  $MODE != "nobs" ) then
+            time ncrename -h -O -v ${FIELD},${MODE}_oma  $IN_DIR/merra2.${INSTRUMENT}.${MODE}3d_oma_p.${YYYY}${MM}${SYNOP}.nc4 $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_oma_p.${YYYY}${MM}${SYNOP}.nc4
+            time ncatted -h -O -a comments,,m,c,"oma" $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_oma_p.${YYYY}${MM}${SYNOP}.nc4
+            time ncatted -h -O -a units,${MODE}_oma,m,c,"K" $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_oma_p.${YYYY}${MM}${SYNOP}.nc4
+            time ncrename -h -O -v ${FIELD},${MODE}_omf $IN_DIR/merra2.${INSTRUMENT}.${MODE}3d_omf_p.${YYYY}${MM}${SYNOP}.nc4 $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_omf_p.${YYYY}${MM}${SYNOP}.nc4
+            time ncatted -h -O -a comments,,m,c,"omf" $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_omf_p.${YYYY}${MM}${SYNOP}.nc4
+            time ncatted -h -O -a units,${MODE}_omf,m,c,"K" $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_omf_p.${YYYY}${MM}${SYNOP}.nc4
+            if ( $kount == 0 ) time ncrcat -h -O $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_bias_p.${YYYY}${MM}${SYNOP}.nc4 $OUT_DIR/${file}
+            if ( $kount > 0 ) time ncrcat -h -A $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_bias_p.${YYYY}${MM}${SYNOP}.nc4 $OUT_DIR/${file}
         endif
-        
-        set flag = 1
-        @ kount = $kount + 1
-        end    #FIELD
-#       echo "we are here"
-        if ( $MODE != "nobs" ) then
-            time ncrcat  -h -A $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_obs.${NYMD}${SYNOP}.nc4   $OUT_DIR/merra2.${INSTRUMENT}.${NYMD}${SYNOP}.nc4
-            time ncrcat  -h -A $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_omf.${NYMD}${SYNOP}.nc4   $OUT_DIR/merra2.${INSTRUMENT}.${NYMD}${SYNOP}.nc4
-            time ncrcat  -h -A $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_oma.${NYMD}${SYNOP}.nc4   $OUT_DIR/merra2.${INSTRUMENT}.${NYMD}${SYNOP}.nc4
-        else
-            time ncrcat  -h -A $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_obs.${NYMD}${SYNOP}.nc4   $OUT_DIR/merra2.${INSTRUMENT}.${NYMD}${SYNOP}.nc4
+
+        time ncrcat -h -A $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_obs_p.${YYYY}${MM}${SYNOP}.nc4 $OUT_DIR/${file}
+
+        if (  $MODE != "nobs" ) then
+            time ncrcat -h -A $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_oma_p.${YYYY}${MM}${SYNOP}.nc4 $OUT_DIR/${file}
+            time ncrcat -h -A $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_omf_p.${YYYY}${MM}${SYNOP}.nc4 $OUT_DIR/${file}
         endif
-        
-#        time ncatted -h -O -a _FillValue,,d,,      $OUT_DIR/merra2.${INSTRUMENT}.${NYMD}${SYNOP}.nc4    
-#        time ncatted -h -O -a fmissing_value,,d,,  $OUT_DIR/merra2.${INSTRUMENT}.${NYMD}${SYNOP}.nc4
-        
-        /bin/rm $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_obs.${NYMD}${SYNOP}.nc4
-        /bin/rm $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_omf.${NYMD}${SYNOP}.nc4
-        /bin/rm $OUT_DIR/merra2.${INSTRUMENT}.${MODE}_oma.${NYMD}${SYNOP}.nc4
+
+       @ kount = $kount + 1
         
     end    #MODE
-    
-    foreach FILE ( `/bin/ls -1 $OUT_DIR/*${SYNOP}.nc4` )
-        foreach FIELD ( `cat ${RC_DIR}/CONV_HOURLY_FINAL_TABLE.csv` )       
-            #             echo $FIELD
-            set LABEL = `grep $FIELD -w ${RC_DIR}/longname_conv_hourly_product_table.csv | cut -d, -f2`
-            set UNITS = `grep $FIELD -w ${RC_DIR}/longname_conv_hourly_product_table.csv | cut -d, -f3`
-            set min = `grep -w $FIELD  ${RC_DIR}/hourly_minmax_conv_product_table.csv | cut -d, -f2`
-            set max = `grep -w $FIELD  ${RC_DIR}/hourly_minmax_conv_product_table.csv | cut -d, -f3`
-            ncatted -h  -a long_name,$FIELD,o,c,"$LABEL" $FILE
-            ncatted -h  -a units,$FIELD,o,c,"$UNITS" $FILE
-            ncatted -h  -a vmin,$FIELD,o,c,"$min" $FILE
-            ncatted -h  -a vmax,$FIELD,o,c,"$max" $FILE
-            ncatted -h -O -a _FillValue,$FIELD,o,f,"1.e+15" $FILE
-            ncatted -h -O -a fmissing_value,$FIELD,d,,   $FILE
-            ncatted -h -O -a missing_value,$FIELD,d,,    $FILE
-            ncatted -h -O -a eulaVlliF_,$FIELD,d,,       $FILE
-        end
-    end
-    
+    time ncrcat -h -A $WAVELENGTH_TABLES/merra2.${INSTRUMENT}.freq_wave.*.nc4 $OUT_DIR/${file}
+
     #               UPDATE GLOBAL METADTA
     # Extract values from lookup tables
     #   echo " skip $skip"
