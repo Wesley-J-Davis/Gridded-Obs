@@ -103,121 +103,121 @@ wait
 /bin/rm -f ${DayDir}/*${SYNOP_TABLE}z*nc4*pid*.tmp
 /bin/rm -f ${DayDir}/*${SYNOP_TABLE}z*.nc4 
 
-/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_fileo}.bias.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_obs_p.${Date}${syn_tag} -zrev
-$EXE_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_obs_p.${Date}${syn_tag}.nc
+/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_fileo}.bias.nc4 -o ${DayDir}/$TAG.${INSTRUMENT}.mean3d_obs_p.${Date}${syn_tag} -zrev
+$EXE_DIR/run_ncrcat.csh ${DayDir}/$TAG.${INSTRUMENT}.mean3d_obs_p.${Date}${syn_tag}.nc
 
-/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_fileo}.nobs.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_obs_p.${Date}${syn_tag} -zrev
-$EXE_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_obs_p.${Date}${syn_tag}.nc
+/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_fileo}.nobs.nc4 -o ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_obs_p.${Date}${syn_tag} -zrev
+$EXE_DIR/run_ncrcat.csh ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_obs_p.${Date}${syn_tag}.nc
 
-/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_fileo}.stdv.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_obs_p.${Date}${syn_tag} -zrev
-$EXE_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_obs_p.${Date}${syn_tag}.nc
+/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_fileo}.stdv.nc4 -o ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_obs_p.${Date}${syn_tag} -zrev
+$EXE_DIR/run_ncrcat.csh ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_obs_p.${Date}${syn_tag}.nc
 
-/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filef}.bias.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_omf_p.${Date}${syn_tag} -zrev
-$EXE_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_omf_p.${Date}${syn_tag}.nc
+/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filef}.bias.nc4 -o ${DayDir}/$TAG.${INSTRUMENT}.mean3d_omf_p.${Date}${syn_tag} -zrev
+$EXE_DIR/run_ncrcat.csh ${DayDir}/$TAG.${INSTRUMENT}.mean3d_omf_p.${Date}${syn_tag}.nc
 
-/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filef}.nobs.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_omf_p.${Date}${syn_tag} -zrev
-$EXE_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_omf_p.${Date}${syn_tag}.nc
+/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filef}.nobs.nc4 -o ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_omf_p.${Date}${syn_tag} -zrev
+$EXE_DIR/run_ncrcat.csh ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_omf_p.${Date}${syn_tag}.nc
 
-/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filef}.stdv.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_omf_p.${Date}${syn_tag} -zrev
-$EXE_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_omf_p.${Date}${syn_tag}.nc
+/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filef}.stdv.nc4 -o ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_omf_p.${Date}${syn_tag} -zrev
+$EXE_DIR/run_ncrcat.csh ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_omf_p.${Date}${syn_tag}.nc
    
-/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filef}.bias.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_omf_p.${Date}${syn_tag} -zrev
-$EXE_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_omf_p.${Date}${syn_tag}.nc
+/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filef}.bias.nc4 -o ${DayDir}/$TAG.${INSTRUMENT}.mean3d_omf_p.${Date}${syn_tag} -zrev
+$EXE_DIR/run_ncrcat.csh ${DayDir}/$TAG.${INSTRUMENT}.mean3d_omf_p.${Date}${syn_tag}.nc
 
-/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filef}.nobs.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_omf_p.${Date}${syn_tag} -zrev
-$EXE_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_omf_p.${Date}${syn_tag}.nc
+/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filef}.nobs.nc4 -o ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_omf_p.${Date}${syn_tag} -zrev
+$EXE_DIR/run_ncrcat.csh ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_omf_p.${Date}${syn_tag}.nc
 
-/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filef}.stdv.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_omf_p.${Date}${syn_tag} -zrev
-$EXE_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_omf_p.${Date}${syn_tag}.nc
+/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filef}.stdv.nc4 -o ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_omf_p.${Date}${syn_tag} -zrev
+$EXE_DIR/run_ncrcat.csh ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_omf_p.${Date}${syn_tag}.nc
 
-/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filea}.bias.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_oma_p.${Date}${syn_tag} -zrev
-$EXE_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_oma_p.${Date}${syn_tag}.nc
+/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filea}.bias.nc4 -o ${DayDir}/$TAG.${INSTRUMENT}.mean3d_oma_p.${Date}${syn_tag} -zrev
+$EXE_DIR/run_ncrcat.csh ${DayDir}/$TAG.${INSTRUMENT}.mean3d_oma_p.${Date}${syn_tag}.nc
 
-/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filea}.nobs.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_oma_p.${Date}${syn_tag} -zrev
-$EXE_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_oma_p.${Date}${syn_tag}.nc
+/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filea}.nobs.nc4 -o ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_oma_p.${Date}${syn_tag} -zrev
+$EXE_DIR/run_ncrcat.csh ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_oma_p.${Date}${syn_tag}.nc
 
-/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filea}.stdv.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_oma_p.${Date}${syn_tag} -zrev
-$EXE_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_oma_p.${Date}${syn_tag}.nc
+/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filea}.stdv.nc4 -o ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_oma_p.${Date}${syn_tag} -zrev
+$EXE_DIR/run_ncrcat.csh ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_oma_p.${Date}${syn_tag}.nc
 
-/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_fileb}.bias.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_bias_p.${Date}${syn_tag} -zrev
-$EXE_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_bias_p.${Date}${syn_tag}.nc
+/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_fileb}.bias.nc4 -o ${DayDir}/$TAG.${INSTRUMENT}.mean3d_bias_p.${Date}${syn_tag} -zrev
+$EXE_DIR/run_ncrcat.csh ${DayDir}/$TAG.${INSTRUMENT}.mean3d_bias_p.${Date}${syn_tag}.nc
 
-/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_fileb}.nobs.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_bias_p.${Date}${syn_tag} -zrev
-$EXE_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_bias_p.${Date}${syn_tag}.nc
+/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_fileb}.nobs.nc4 -o ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_bias_p.${Date}${syn_tag} -zrev
+$EXE_DIR/run_ncrcat.csh ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_bias_p.${Date}${syn_tag}.nc
 
-/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_fileb}.stdv.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_bias_p.${Date}${syn_tag} -zrev
-$EXE_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_bias_p.${Date}${syn_tag}.nc
+/discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_fileb}.stdv.nc4 -o ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_bias_p.${Date}${syn_tag} -zrev
+$EXE_DIR/run_ncrcat.csh ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_bias_p.${Date}${syn_tag}.nc
 
-if ( -e $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_obs_p.${YYYY}${MM}${syn_tag}.nc ) then
-    mv -f $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_obs_p.${YYYY}${MM}${syn_tag}.nc  $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_obs_p.${YYYY}${MM}${syn_tag}.nc4
+if ( -e ${DayDir}/$TAG.${INSTRUMENT}.mean3d_obs_p.${YYYY}${MM}${syn_tag}.nc ) then
+    mv -f ${DayDir}/$TAG.${INSTRUMENT}.mean3d_obs_p.${YYYY}${MM}${syn_tag}.nc  ${DayDir}/$TAG.${INSTRUMENT}.mean3d_obs_p.${YYYY}${MM}${syn_tag}.nc4
 else
-    mv -f ${out_fileo}.bias.nc4 $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_obs_p.${YYYY}${MM}${syn_tag}.nc4
+    mv -f ${out_fileo}.bias.nc4 ${DayDir}/$TAG.${INSTRUMENT}.mean3d_obs_p.${YYYY}${MM}${syn_tag}.nc4
 endif
     
-if ( -e $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_obs_p.${YYYY}${MM}${syn_tag}.nc ) then
-    mv -f $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_obs_p.${YYYY}${MM}${syn_tag}.nc  $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_obs_p.${YYYY}${MM}${syn_tag}.nc4
+if ( -e ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_obs_p.${YYYY}${MM}${syn_tag}.nc ) then
+    mv -f ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_obs_p.${YYYY}${MM}${syn_tag}.nc  ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_obs_p.${YYYY}${MM}${syn_tag}.nc4
 else
-    mv -f ${out_fileo}.nobs.nc4 $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_obs_p.${YYYY}${MM}${syn_tag}.nc4
+    mv -f ${out_fileo}.nobs.nc4 ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_obs_p.${YYYY}${MM}${syn_tag}.nc4
 endif
      
-if ( -e $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_obs_p.${Date}${syn_tag}.nc ) then
-    mv -f $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_obs_p.${Date}${syn_tag}.nc  $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_obs_p.${Date}${syn_tag}.nc4
+if ( -e ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_obs_p.${Date}${syn_tag}.nc ) then
+    mv -f ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_obs_p.${Date}${syn_tag}.nc  ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_obs_p.${Date}${syn_tag}.nc4
 else
-    mv -f ${out_fileo}.stdv.nc4 $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_obs_p.${Date}${syn_tag}.nc4
+    mv -f ${out_fileo}.stdv.nc4 ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_obs_p.${Date}${syn_tag}.nc4
 endif
 
-if ( -e $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_omf_p.${Date}${syn_tag}.nc ) then
-    mv -f $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_omf_p.${Date}${syn_tag}.nc $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_omf_p.${Date}${syn_tag}.nc4
+if ( -e ${DayDir}/$TAG.${INSTRUMENT}.mean3d_omf_p.${Date}${syn_tag}.nc ) then
+    mv -f ${DayDir}/$TAG.${INSTRUMENT}.mean3d_omf_p.${Date}${syn_tag}.nc ${DayDir}/$TAG.${INSTRUMENT}.mean3d_omf_p.${Date}${syn_tag}.nc4
 else
-    mv -f ${out_filef}.bias.nc4  $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_omf_p.${Date}${syn_tag}.nc4
+    mv -f ${out_filef}.bias.nc4  ${DayDir}/$TAG.${INSTRUMENT}.mean3d_omf_p.${Date}${syn_tag}.nc4
 endif
   
-if ( -e $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_omf_p.${Date}${syn_tag}.nc ) then
-    mv -f $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_omf_p.${Date}${syn_tag}.nc $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_omf_p.${Date}${syn_tag}.nc4
+if ( -e ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_omf_p.${Date}${syn_tag}.nc ) then
+    mv -f ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_omf_p.${Date}${syn_tag}.nc ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_omf_p.${Date}${syn_tag}.nc4
 else
-    mv -f ${out_filef}.nobs.nc4 $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_omf_p.${Date}${syn_tag}.nc4
+    mv -f ${out_filef}.nobs.nc4 ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_omf_p.${Date}${syn_tag}.nc4
 endif
  
-if ( -e $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_omf_p.${Date}${syn_tag}.nc ) then
-    mv -f $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_omf_p.${Date}${syn_tag}.nc $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_omf_p.${Date}${syn_tag}.nc4
+if ( -e ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_omf_p.${Date}${syn_tag}.nc ) then
+    mv -f ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_omf_p.${Date}${syn_tag}.nc ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_omf_p.${Date}${syn_tag}.nc4
 else
-    mv -f ${out_filef}.stdv.nc4 $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_omf_p.${Date}${syn_tag}.nc4
+    mv -f ${out_filef}.stdv.nc4 ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_omf_p.${Date}${syn_tag}.nc4
 endif
 
-if ( -e $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_oma_p.${Date}${syn_tag}.nc ) then
-    mv -f $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_oma_p.${Date}${syn_tag}.nc $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_oma_p.${Date}${syn_tag}.nc4
+if ( -e ${DayDir}/$TAG.${INSTRUMENT}.mean3d_oma_p.${Date}${syn_tag}.nc ) then
+    mv -f ${DayDir}/$TAG.${INSTRUMENT}.mean3d_oma_p.${Date}${syn_tag}.nc ${DayDir}/$TAG.${INSTRUMENT}.mean3d_oma_p.${Date}${syn_tag}.nc4
 else
-    mv -f ${out_filea}.bias.nc4 $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_oma_p.${Date}${syn_tag}.nc4
+    mv -f ${out_filea}.bias.nc4 ${DayDir}/$TAG.${INSTRUMENT}.mean3d_oma_p.${Date}${syn_tag}.nc4
 endif
   
-if ( -e  $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_oma_p.${Date}${syn_tag}.nc ) then
-    mv -f $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_oma_p.${Date}${syn_tag}.nc $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_oma_p.${Date}${syn_tag}.nc4
+if ( -e  ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_oma_p.${Date}${syn_tag}.nc ) then
+    mv -f ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_oma_p.${Date}${syn_tag}.nc ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_oma_p.${Date}${syn_tag}.nc4
 else
-    mv -f ${out_filea}.nobs.nc4 $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_oma_p.${Date}${syn_tag}.nc4
+    mv -f ${out_filea}.nobs.nc4 ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_oma_p.${Date}${syn_tag}.nc4
 endif
  
-if ( -e $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_oma_p.${Date}${syn_tag}.nc ) then
-    mv -f $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_oma_p.${Date}${syn_tag}.nc $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_oma_p.${Date}${syn_tag}.nc4
+if ( -e ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_oma_p.${Date}${syn_tag}.nc ) then
+    mv -f ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_oma_p.${Date}${syn_tag}.nc ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_oma_p.${Date}${syn_tag}.nc4
 else
-    mv -f ${out_filea}.stdv.nc4 $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_oma_p.${Date}${syn_tag}.nc4
+    mv -f ${out_filea}.stdv.nc4 ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_oma_p.${Date}${syn_tag}.nc4
 endif
 
-if ( -e $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_bias_p.${Date}${syn_tag}.nc ) then
-    mv -f $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_bias_p.${Date}${syn_tag}.nc  $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_bias_p.${Date}${syn_tag}.nc4
+if ( -e ${DayDir}/$TAG.${INSTRUMENT}.mean3d_bias_p.${Date}${syn_tag}.nc ) then
+    mv -f ${DayDir}/$TAG.${INSTRUMENT}.mean3d_bias_p.${Date}${syn_tag}.nc  ${DayDir}/$TAG.${INSTRUMENT}.mean3d_bias_p.${Date}${syn_tag}.nc4
 else
-    mv -f ${out_fileb}.bias.nc4 $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_bias_p.${Date}${syn_tag}.nc4
+    mv -f ${out_fileb}.bias.nc4 ${DayDir}/$TAG.${INSTRUMENT}.mean3d_bias_p.${Date}${syn_tag}.nc4
 endif
   
-if ( -e $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_bias_p.${Date}${syn_tag}.nc ) then
-    mv -f $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_bias_p.${Date}${syn_tag}.nc  $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_bias_p.${Date}${syn_tag}.nc4
+if ( -e ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_bias_p.${Date}${syn_tag}.nc ) then
+    mv -f ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_bias_p.${Date}${syn_tag}.nc  ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_bias_p.${Date}${syn_tag}.nc4
 else
-    mv -f ${out_fileb}.nobs.nc4 $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_bias_p.${Date}${syn_tag}.nc4
+    mv -f ${out_fileb}.nobs.nc4 ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_bias_p.${Date}${syn_tag}.nc4
 endif
 
-if ( -e $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_bias_p.${Date}${syn_tag}.nc ) then
-    mv -f $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_bias_p.${Date}${syn_tag}.nc  $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_bias_p.${Date}${syn_tag}.nc4
+if ( -e ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_bias_p.${Date}${syn_tag}.nc ) then
+    mv -f ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_bias_p.${Date}${syn_tag}.nc  ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_bias_p.${Date}${syn_tag}.nc4
 else
-    mv -f ${out_fileb}.stdv.nc4 $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_bias_p.${Date}${syn_tag}.nc4
+    mv -f ${out_fileb}.stdv.nc4 ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_bias_p.${Date}${syn_tag}.nc4
 endif
 
-echo $STORAGE_DIR
+echo $NYMD radiance processing complete
