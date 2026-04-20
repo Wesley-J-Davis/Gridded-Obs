@@ -82,70 +82,165 @@ foreach YYYYMM ( `echo $YEAR_TABLE` )
      if ( $Day0 < 10 ) then
        set Day = 0$Day0
      endif
-     set Date = ${YYYY}${MM}${Day}
 
-     set DayDir        = $STORAGE_DIR/D${Day}
-     
+     set Date   = ${YYYY}${MM}${Day}
+     set DayDir = $STORAGE_DIR/D${Day}
      echo "DayDir $DayDir"
      mkdir -p ${DayDir}
+     chmod 755 ${DayDir}
+
      foreach Hour ( `echo $SYNOP_TABLE` )
-      set DateHr = ${YYYY}${MM}${Day}_${Hour}z.bin
+      set ods_Files = `ls -1 $OBS_DIR/${INSTRUMENT}/${Date}/*.diag_${INSTRUMENT}.${Date}*_${Hour}z.ods`
+      set syn_tag = "_${Hour}z"
+      echo $ods_Files
 
       set out_fileo   = gritaso${Hour}
       /bin/rm -f ${out_fileo}.{bias,stdv,nobs}.nc4
-                        # Print MPI and resource information
-                        #echo "Starting MPI statistical calculations at `date`"
-                        #echo "Number of MPI processes: $SLURM_NTASKS"
-                        #echo "Processes per node: $SLURM_NTASKS_PER_NODE"
-                        #echo "Available memory: `free -h`"
-                        #mpirun -np $SLURM_NTASKS 
-			$gritas -obs -o $out_fileo $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr &
+      $gritas -obs -o $out_fileo $Gritas_Core_Opt ${ods_Files} &
       wait
 
+      #    ... for o-f data
       set out_filef   = gritasf${Hour}
-      /bin/rm -f ${out_filef}.{bias,stdv,nobs}.hdf
-                        # Print MPI and resource information
-                        #echo "Starting MPI statistical calculations at `date`"
-                        #echo "Number of MPI processes: $SLURM_NTASKS"
-                        #echo "Processes per node: $SLURM_NTASKS_PER_NODE"
-                        #echo "Available memory: `free -h`"
-                        #mpirun -np $SLURM_NTASKS 
-			$gritas -omf -o $out_filef $Gritas_Core_Opt ${ExpID}.diag_conv_ges.$DateHr &
+      /bin/rm -f ${out_filef}.{bias,stdv,nobs}.nc4
+      $gritas -omf -o $out_filef $Gritas_Core_Opt ${ods_Files} &
       wait
-      
+
+      #    ... for o-a data
       set out_filea   = gritasa${Hour}
-      /bin/rm -f ${out_filea}.{bias,stdv,nobs}.hdf
-                        ## THIS ONE NEEDS TO BE OMF, DON'T CHANGE TO OMA
-                        # Print MPI and resource information
-                        #echo "Starting MPI statistical calculations at `date`"
-                        #echo "Number of MPI processes: $SLURM_NTASKS"
-                        #echo "Processes per node: $SLURM_NTASKS_PER_NODE"
-                        #echo "Available memory: `free -h`"
-                        #mpirun -np $SLURM_NTASKS 
-			$gritas -omf -o $out_filea $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr &
+      /bin/rm -f ${out_filea}.{bias,stdv,nobs}.nc4
+      $gritas -oma -o $out_filea $Gritas_Core_Opt ${ods_Files} &
       wait
+
+      #    ... for bias data
+      set out_fileb   = gritasb${Hour}
+      /bin/rm -f ${out_fileb}.{bias,stdv,nobs}.nc4
+      $gritas -obias -o $out_fileb $Gritas_Core_Opt ${ods_Files} &
+      wait
+      #rm -f ${ods_Files}
+
       # clean the work dir for that day of any pre-existing files for that synoptic time
       /bin/rm -f ${DayDir}/*${Hour}z*nc4*pid*.tmp
       /bin/rm -f ${DayDir}/*${Hour}z*.nc4 
 
-      mv ${out_fileo}.bias.hdf ${DayDir}/$TAG.mean3d_obs_p.${Date}_${Hour}z.nc4
-      mv ${out_fileo}.stdv.hdf ${DayDir}/$TAG.stdv3d_obs_p.${Date}_${Hour}z.nc4
-      mv ${out_fileo}.nobs.hdf ${DayDir}/$TAG.nobs3d_obs_p.${Date}_${Hour}z.nc4
+      /discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_fileo}.bias.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_obs_p.${Date}${syn_tag} -zrev
+      $RC_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_obs_p.${Date}${syn_tag}.nc
 
-      mv ${out_filef}.bias.hdf ${DayDir}/$TAG.mean3d_omf_p.${Date}_${Hour}z.nc4
-      mv ${out_filef}.stdv.hdf ${DayDir}/$TAG.stdv3d_omf_p.${Date}_${Hour}z.nc4
-      mv ${out_filef}.nobs.hdf ${DayDir}/$TAG.nobs3d_omf_p.${Date}_${Hour}z.nc4
+      /discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_fileo}.nobs.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_obs_p.${Date}${syn_tag} -zrev
+      $RC_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_obs_p.${Date}${syn_tag}.nc
 
-      mv ${out_filea}.bias.hdf ${DayDir}/$TAG.mean3d_oma_p.${Date}_${Hour}z.nc4
-      mv ${out_filea}.stdv.hdf ${DayDir}/$TAG.stdv3d_oma_p.${Date}_${Hour}z.nc4
-      mv ${out_filea}.nobs.hdf ${DayDir}/$TAG.nobs3d_oma_p.${Date}_${Hour}z.nc4
+      /discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_fileo}.stdv.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_obs_p.${Date}${syn_tag} -zrev
+      $RC_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_obs_p.${Date}${syn_tag}.nc
 
-      nohup  $n4zip_file ${DayDir}/$TAG*mean3d*${Date}_${Hour}*.nc4
-      nohup  $n4zip_file ${DayDir}/$TAG*stdv3d*${Date}_${Hour}*.nc4
-      nohup  $n4zip_file ${DayDir}/$TAG*nobs3d*${Date}_${Hour}*.nc4
+      /discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filef}.bias.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_omf_p.${Date}${syn_tag} -zrev
+      $RC_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_omf_p.${Date}${syn_tag}.nc
 
-    end
+      /discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filef}.nobs.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_omf_p.${Date}${syn_tag} -zrev
+      $RC_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_omf_p.${Date}${syn_tag}.nc
+
+      /discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filef}.stdv.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_omf_p.${Date}${syn_tag} -zrev
+      $RC_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_omf_p.${Date}${syn_tag}.nc
+   
+      /discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filef}.bias.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_omf_p.${Date}${syn_tag} -zrev
+      $RC_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_omf_p.${Date}${syn_tag}.nc
+
+      /discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filef}.nobs.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_omf_p.${Date}${syn_tag} -zrev
+      $RC_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_omf_p.${Date}${syn_tag}.nc
+
+      /discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filef}.stdv.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_omf_p.${Date}${syn_tag} -zrev
+      $RC_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_omf_p.${Date}${syn_tag}.nc
+
+      /discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filea}.bias.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_oma_p.${Date}${syn_tag} -zrev
+      $RC_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_oma_p.${Date}${syn_tag}.nc
+
+      /discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filea}.nobs.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_oma_p.${Date}${syn_tag} -zrev
+      $RC_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_oma_p.${Date}${syn_tag}.nc
+
+      /discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_filea}.stdv.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_oma_p.${Date}${syn_tag} -zrev
+      $RC_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_oma_p.${Date}${syn_tag}.nc
+
+      /discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_fileb}.bias.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_bias_p.${Date}${syn_tag} -zrev
+      $RC_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_bias_p.${Date}${syn_tag}.nc
+
+      /discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_fileb}.nobs.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_bias_p.${Date}${syn_tag} -zrev
+      $RC_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_bias_p.${Date}${syn_tag}.nc
+
+      /discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_fileb}.stdv.nc4 -o $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_bias_p.${Date}${syn_tag} -zrev
+      $RC_DIR/run_ncrcat.csh $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_bias_p.${Date}${syn_tag}.nc
+
+      if ( -e $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_obs_p.${YYYY}${MM}${syn_tag}.nc ) then
+          mv -f $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_obs_p.${YYYY}${MM}${syn_tag}.nc  $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_obs_p.${YYYY}${MM}${syn_tag}.nc4
+      else
+          mv -f ${out_fileo}.bias.nc4 $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_obs_p.${YYYY}${MM}${syn_tag}.nc4
+      endif
+    
+      if ( -e $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_obs_p.${YYYY}${MM}${syn_tag}.nc ) then
+          mv -f $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_obs_p.${YYYY}${MM}${syn_tag}.nc  $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_obs_p.${YYYY}${MM}${syn_tag}.nc4
+      else
+          mv -f ${out_fileo}.nobs.nc4 $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_obs_p.${YYYY}${MM}${syn_tag}.nc4
+      endif
+     
+      if ( -e $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_obs_p.${Date}${syn_tag}.nc ) then
+          mv -f $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_obs_p.${Date}${syn_tag}.nc  $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_obs_p.${Date}${syn_tag}.nc4
+      else
+          mv -f ${out_fileo}.stdv.nc4 $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_obs_p.${Date}${syn_tag}.nc4
+      endif
+
+      if ( -e $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_omf_p.${Date}${syn_tag}.nc ) then
+          mv -f $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_omf_p.${Date}${syn_tag}.nc $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_omf_p.${Date}${syn_tag}.nc4
+      else
+          mv -f ${out_filef}.bias.nc4  $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_omf_p.${Date}${syn_tag}.nc4
+      endif
+  
+      if ( -e $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_omf_p.${Date}${syn_tag}.nc ) then
+          mv -f $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_omf_p.${Date}${syn_tag}.nc $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_omf_p.${Date}${syn_tag}.nc4
+      else
+          mv -f ${out_filef}.nobs.nc4 $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_omf_p.${Date}${syn_tag}.nc4
+      endif
+ 
+      if ( -e $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_omf_p.${Date}${syn_tag}.nc ) then
+          mv -f $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_omf_p.${Date}${syn_tag}.nc $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_omf_p.${Date}${syn_tag}.nc4
+      else
+          mv -f ${out_filef}.stdv.nc4 $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_omf_p.${Date}${syn_tag}.nc4
+      endif
+
+      if ( -e $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_oma_p.${Date}${syn_tag}.nc ) then
+          mv -f $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_oma_p.${Date}${syn_tag}.nc $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_oma_p.${Date}${syn_tag}.nc4
+      else
+          mv -f ${out_filea}.bias.nc4 $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_oma_p.${Date}${syn_tag}.nc4
+      endif
+  
+      if ( -e  $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_oma_p.${Date}${syn_tag}.nc ) then
+          mv -f $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_oma_p.${Date}${syn_tag}.nc $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_oma_p.${Date}${syn_tag}.nc4
+      else
+          mv -f ${out_filea}.nobs.nc4 $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_oma_p.${Date}${syn_tag}.nc4
+      endif
+ 
+      if ( -e $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_oma_p.${Date}${syn_tag}.nc ) then
+          mv -f $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_oma_p.${Date}${syn_tag}.nc $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_oma_p.${Date}${syn_tag}.nc4
+      else
+          mv -f ${out_filea}.stdv.nc4 $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_oma_p.${Date}${syn_tag}.nc4
+      endif
+
+      if ( -e $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_bias_p.${Date}${syn_tag}.nc ) then
+          mv -f $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_bias_p.${Date}${syn_tag}.nc  $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_bias_p.${Date}${syn_tag}.nc4
+      else
+          mv -f ${out_fileb}.bias.nc4 $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.mean3d_bias_p.${Date}${syn_tag}.nc4
+      endif
+  
+      if ( -e $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_bias_p.${Date}${syn_tag}.nc ) then
+          mv -f $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_bias_p.${Date}${syn_tag}.nc  $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_bias_p.${Date}${syn_tag}.nc4
+      else
+          mv -f ${out_fileb}.nobs.nc4 $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.nobs3d_bias_p.${Date}${syn_tag}.nc4
+      endif
+  
+      if ( -e $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_bias_p.${Date}${syn_tag}.nc ) then
+          mv -f $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_bias_p.${Date}${syn_tag}.nc  $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_bias_p.${Date}${syn_tag}.nc4
+      else
+          mv -f ${out_fileb}.stdv.nc4 $STORAGE_DIR/$INSTRUMENT/$RES/Y$YYYY/M$MM/$TAG.${INSTRUMENT}.stdv3d_bias_p.${Date}${syn_tag}.nc4
+      endif
+
+     end #foreach HOUR loop
     @ Day0 = $Day0 + 1
-   end
-end
+   end #while day < end of month loop
+end # for each year_table loop
 echo $STORAGE_DIR
