@@ -42,6 +42,8 @@ set WorkRootDir  =  /discover/nobackup/projects/gmao/merra2/data/obs/.WORK
 set Storage_Base =  $WorkRootDir/work_dir_wjd/${INSTRUMENT_TABLE}/$RES
 set Work_Base	 =  $WorkRootDir/raw_obs_wjd/${INSTRUMENT_TABLE}
 
+set OBS_DIR     = /discover/nobackup/projects/gmao/merra2/data/obs/.WORK/raw_obs_wjd
+
 set n4zip_file   = ${EXE_DIR}/n4zip.csh
 
 echo " BinDir   $BinDir"
