@@ -35,14 +35,14 @@ set BinDir = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS/GrI
 setenv TAG   merra2
 set RES      = 'd'
 #set Gritas_Core_Opt  = "-nlevs 106 -rc $RC_File -hdf -res $RES -ncf -ospl -lb -nopassive"
-set Gritas_Core_Opt  = "-nlevs 50 -rc $RC_File -res d -ncf -ospl -lb -nopassive"
+set Gritas_Core_Opt  = "-nlevs 50 -rc $RC_File -res d -ospl -lb -nopassive"
 set gritas  = ${BinDir}/gritas.x
 set grmeans = ${BinDir}/GFIO_mean_r8.x
 
 # establish paths for each stage of data
 set HOME_MOUNT  =  /discover/nobackup/projects/gmao/merra2/data/obs/.WORK
-set WORKING_DIR =  $HOME_MOUNT/work_dir_wjd/${INSTRUMENT/$RES
-set OBS_DIR	 =  $HOME_MOUNT/raw_obs_wjd/${INSTRUMENT}
+set WORKING_DIR =  ${HOME_MOUNT}/work_dir_wjd/${INSTRUMENT}/$RES
+set OBS_DIR	 =  ${HOME_MOUNT}/raw_obs_wjd/${INSTRUMENT}
 
 set YYYY = `echo $YEAR_TABLE | cut -c 1-4`
 set MM   = `echo $YEAR_TABLE | cut -c 5-6`
@@ -60,36 +60,35 @@ mkdir -p ${DayDir}
 chmod 755 ${DayDir}
 
 
-# cd $DataDir
+cd $DataDir
 #/discover/nobackup/projects/gmao/merra2/data/obs/.WORK/raw_obs_wjd/airs_aqua/201212/d5124_m2_jan10.diag_airs_aqua.20121231_18z.ods
 
 set ods_Files = `ls -1 ${DataDir}/*.diag_${INSTRUMENT}.${Date}*_${SYNOP_TABLE}z.ods`
 set syn_tag = "_${SYNOP_TABLE}z"
 echo $ods_Files
 
-set out_fileo   = gritaso${NYMD}${SYNOP_TABLE}
+set out_fileo   = $DataDir/gritaso${NYMD}${SYNOP_TABLE}
 /bin/rm -f ${out_fileo}.{bias,stdv,nobs}.nc4
 $gritas -obs -o $out_fileo $Gritas_Core_Opt ${ods_Files} &
 wait
 
 #    ... for o-f data
-set out_filef   = $DayDir/gritasf${NYMD}${SYNOP_TABLE}
+set out_filef   = $DataDir/gritasf${NYMD}${SYNOP_TABLE}
 /bin/rm -f ${out_filef}.{bias,stdv,nobs}.nc4
 $gritas -omf -o $out_filef $Gritas_Core_Opt ${ods_Files} &
 wait
 
 #    ... for o-a data
-set out_filea   = gritasa${NYMD}${SYNOP_TABLE}
+set out_filea   = $DataDir/gritasa${NYMD}${SYNOP_TABLE}
 /bin/rm -f ${out_filea}.{bias,stdv,nobs}.nc4
 $gritas -oma -o $out_filea $Gritas_Core_Opt ${ods_Files} &
 wait
 
 #    ... for bias data
-set out_fileb   = gritasb${NYMD}${SYNOP_TABLE}
+set out_fileb   = $DataDir/gritasb${NYMD}${SYNOP_TABLE}
 /bin/rm -f ${out_fileb}.{bias,stdv,nobs}.nc4
 $gritas -obias -o $out_fileb $Gritas_Core_Opt ${ods_Files} &
 wait
-#rm -f ${ods_Files}
 
 # clean the work dir for that day of any pre-existing files for that synoptic time
 /bin/rm -f ${DayDir}/*${SYNOP_TABLE}z*nc4*pid*.tmp
