@@ -26,7 +26,7 @@ set WAVELENGTH_TABLES = ${RC_DIR}/WAVELENGTH_TABLES
 set METADATA_TABLE = ${RC_DIR}/metadata.tbl
 set PRODUCT_TABLE  = ${RC_DIR}/M2_OPS_hourly_product_table.csv
 
-set CurrentMonth_FirstDay  = ${YYYY}${MM}01
+set CurrentMonth_FirstDay  = ${Date}01
 set PreviousMonth_LastDay = `/usr/bin/perl /home/dao_ops/bin/tick ${CurrentMonth_FirstDay} 000000 -1 0 | cut -d' ' -f1`
 set NextMonth             = `/usr/bin/perl /home/dao_ops/bin/tick ${CurrentMonth_FirstDay} 000000  32 0 | cut -d' ' -f1 | cut -c1-6`
 set CurrentMonth_LastDay = `/usr/bin/perl /home/dao_ops/bin/tick ${NextMonth}01 000000 -1 0 | cut -d' ' -f1`
@@ -83,35 +83,35 @@ else
 endif
 set kount = 0
    
-set file  = merra2.${INSTRUMENT}.${YYYY}${MM}${SYNOP}.nc4
+set file  = merra2.${INSTRUMENT}.${Date}${SYNOP}.nc4
     
 foreach MODE ( mean nobs stdv )
     if (  $MODE != "nobs" ) then
-        time ncrename -h -O -v ${FIELD},${MODE}_bias $IN_DIR/merra2.${INSTRUMENT}.${MODE}3d_bias_p.${YYYY}${MM}${SYNOP}.nc4 $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_bias_p.${YYYY}${MM}${SYNOP}.nc4
-        time ncatted -h -O -a comments,,m,c,"bias" $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_bias_p.${YYYY}${MM}${SYNOP}.nc4
-        time ncatted -h -O -a units,${MODE}_bias,m,c,"K" $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_bias_p.${YYYY}${MM}${SYNOP}.nc4
+        time ncrename -h -O -v ${FIELD},${MODE}_bias $IN_DIR/merra2.${INSTRUMENT}.${MODE}3d_bias_p.${Date}${SYNOP}.nc4 $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_bias_p.${Date}${SYNOP}.nc4
+        time ncatted -h -O -a comments,,m,c,"bias" $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_bias_p.${Date}${SYNOP}.nc4
+        time ncatted -h -O -a units,${MODE}_bias,m,c,"K" $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_bias_p.${Date}${SYNOP}.nc4
     endif
 
-    time ncrename -h -O -v ${FIELD},${MODE}_obs  $IN_DIR/merra2.${INSTRUMENT}.${MODE}3d_obs_p.${YYYY}${MM}${SYNOP}.nc4 $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_obs_p.${YYYY}${MM}${SYNOP}.nc4
-    time ncatted -h -O -a comments,,m,c,"obs" $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_obs_p.${YYYY}${MM}${SYNOP}.nc4
-    time ncatted -h -O -a units,${MODE}_obs,m,c,"K" $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_obs_p.${YYYY}${MM}${SYNOP}.nc4
+    time ncrename -h -O -v ${FIELD},${MODE}_obs  $IN_DIR/merra2.${INSTRUMENT}.${MODE}3d_obs_p.${Date}${SYNOP}.nc4 $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_obs_p.${Date}${SYNOP}.nc4
+    time ncatted -h -O -a comments,,m,c,"obs" $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_obs_p.${Date}${SYNOP}.nc4
+    time ncatted -h -O -a units,${MODE}_obs,m,c,"K" $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_obs_p.${Date}${SYNOP}.nc4
 
     if (  $MODE != "nobs" ) then
-        time ncrename -h -O -v ${FIELD},${MODE}_oma  $IN_DIR/merra2.${INSTRUMENT}.${MODE}3d_oma_p.${YYYY}${MM}${SYNOP}.nc4 $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_oma_p.${YYYY}${MM}${SYNOP}.nc4
-        time ncatted -h -O -a comments,,m,c,"oma" $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_oma_p.${YYYY}${MM}${SYNOP}.nc4
-        time ncatted -h -O -a units,${MODE}_oma,m,c,"K" $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_oma_p.${YYYY}${MM}${SYNOP}.nc4
-        time ncrename -h -O -v ${FIELD},${MODE}_omf $IN_DIR/merra2.${INSTRUMENT}.${MODE}3d_omf_p.${YYYY}${MM}${SYNOP}.nc4 $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_omf_p.${YYYY}${MM}${SYNOP}.nc4
-        time ncatted -h -O -a comments,,m,c,"omf" $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_omf_p.${YYYY}${MM}${SYNOP}.nc4
-        time ncatted -h -O -a units,${MODE}_omf,m,c,"K" $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_omf_p.${YYYY}${MM}${SYNOP}.nc4
-        if ( $kount == 0 ) time ncrcat -h -O $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_bias_p.${YYYY}${MM}${SYNOP}.nc4 $OUT_DIR/${file}
-        if ( $kount > 0 ) time ncrcat -h -A $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_bias_p.${YYYY}${MM}${SYNOP}.nc4 $OUT_DIR/${file}
+        time ncrename -h -O -v ${FIELD},${MODE}_oma  $IN_DIR/merra2.${INSTRUMENT}.${MODE}3d_oma_p.${Date}${SYNOP}.nc4 $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_oma_p.${Date}${SYNOP}.nc4
+        time ncatted -h -O -a comments,,m,c,"oma" $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_oma_p.${Date}${SYNOP}.nc4
+        time ncatted -h -O -a units,${MODE}_oma,m,c,"K" $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_oma_p.${Date}${SYNOP}.nc4
+        time ncrename -h -O -v ${FIELD},${MODE}_omf $IN_DIR/merra2.${INSTRUMENT}.${MODE}3d_omf_p.${Date}${SYNOP}.nc4 $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_omf_p.${Date}${SYNOP}.nc4
+        time ncatted -h -O -a comments,,m,c,"omf" $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_omf_p.${Date}${SYNOP}.nc4
+        time ncatted -h -O -a units,${MODE}_omf,m,c,"K" $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_omf_p.${Date}${SYNOP}.nc4
+        if ( $kount == 0 ) time ncrcat -h -O $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_bias_p.${Date}${SYNOP}.nc4 $OUT_DIR/${file}
+        if ( $kount > 0 ) time ncrcat -h -A $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_bias_p.${Date}${SYNOP}.nc4 $OUT_DIR/${file}
     endif
 
-    time ncrcat -h -A $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_obs_p.${YYYY}${MM}${SYNOP}.nc4 $OUT_DIR/${file}
+    time ncrcat -h -A $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_obs_p.${Date}${SYNOP}.nc4 $OUT_DIR/${file}
 
     if (  $MODE != "nobs" ) then
-        time ncrcat -h -A $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_oma_p.${YYYY}${MM}${SYNOP}.nc4 $OUT_DIR/${file}
-        time ncrcat -h -A $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_omf_p.${YYYY}${MM}${SYNOP}.nc4 $OUT_DIR/${file}
+        time ncrcat -h -A $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_oma_p.${Date}${SYNOP}.nc4 $OUT_DIR/${file}
+        time ncrcat -h -A $OUT_DIR/merra2.${INSTRUMENT}.${MODE}3d_omf_p.${Date}${SYNOP}.nc4 $OUT_DIR/${file}
     endif
 
     @ kount = $kount + 1
