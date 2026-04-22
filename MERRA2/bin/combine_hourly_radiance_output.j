@@ -13,11 +13,9 @@ set skip = 0
 set YYYY = `echo $NYMD | cut -c 1-4`
 set   MM = `echo $NYMD | cut -c 5-6`
 set   DD = `echo $NYMD | cut -c 7-8`
-
+set Date = $NYMD
 set prod_date = `date -u "+%Y-%m-%dT%TZ"`
 echo $prod_date
-
-/bin/rm -f $OUT_DIR/*pid*
 
 set RootDir = /home/dao_ops/operations/GIT-OPS/Gridded-Obs/MERRA2
 set RC_DIR      = ${RootDir}/etc
@@ -26,7 +24,7 @@ set WAVELENGTH_TABLES = ${RC_DIR}/WAVELENGTH_TABLES
 set METADATA_TABLE = ${RC_DIR}/metadata.tbl
 set PRODUCT_TABLE  = ${RC_DIR}/M2_OPS_hourly_product_table.csv
 
-set CurrentMonth_FirstDay  = ${Date}01
+set CurrentMonth_FirstDay  = ${YYYY}${MM}01
 set PreviousMonth_LastDay = `/usr/bin/perl /home/dao_ops/bin/tick ${CurrentMonth_FirstDay} 000000 -1 0 | cut -d' ' -f1`
 set NextMonth             = `/usr/bin/perl /home/dao_ops/bin/tick ${CurrentMonth_FirstDay} 000000  32 0 | cut -d' ' -f1 | cut -c1-6`
 set CurrentMonth_LastDay = `/usr/bin/perl /home/dao_ops/bin/tick ${NextMonth}01 000000 -1 0 | cut -d' ' -f1`
@@ -82,7 +80,8 @@ else
     set SYNOP = "_${SYNOP_TABLE}z"
 endif
 set kount = 0
-   
+/discover/nobackup/projects/gmao/merra2/data/obs/.WORK/products_revised/airs_aqua/d/Y2012/M12/D01/merra2.airs_aqua.20121201_00z.nc4.pid3085.ncrcat.tmp   
+/bin/rm -f $OUT_DIR/*${Date}${SYNOP}*pid*
 set file  = merra2.${INSTRUMENT}.${Date}${SYNOP}.nc4
     
 foreach MODE ( mean nobs stdv )
