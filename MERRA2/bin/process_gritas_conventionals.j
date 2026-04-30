@@ -98,7 +98,6 @@ foreach YYYYMM ( `echo $YEAR_TABLE` )
                         #echo "Available memory: `free -h`"
                         #mpirun -np $SLURM_NTASKS 
 			$gritas -obs -o $out_fileo $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr &
-      wait
 
       set out_filef   = gritasf${Hour}
       /bin/rm -f ${out_filef}.{bias,stdv,nobs}.hdf
@@ -109,7 +108,6 @@ foreach YYYYMM ( `echo $YEAR_TABLE` )
                         #echo "Available memory: `free -h`"
                         #mpirun -np $SLURM_NTASKS 
 			$gritas -omf -o $out_filef $Gritas_Core_Opt ${ExpID}.diag_conv_ges.$DateHr &
-      wait
       
       set out_filea   = gritasa${Hour}
       /bin/rm -f ${out_filea}.{bias,stdv,nobs}.hdf
@@ -121,8 +119,10 @@ foreach YYYYMM ( `echo $YEAR_TABLE` )
                         #echo "Available memory: `free -h`"
                         #mpirun -np $SLURM_NTASKS 
 			$gritas -omf -o $out_filea $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr &
-      wait
+      
       # clean the work dir for that day of any pre-existing files for that synoptic time
+      # move recently created gritas output to holding directory
+      # n4zip compresses and sets permissions
       /bin/rm -f ${DayDir}/*${Hour}z*nc4*pid*.tmp
       /bin/rm -f ${DayDir}/*${Hour}z*.nc4 
 
