@@ -1,6 +1,5 @@
 #!/bin/csh -f
 
-#SBATCH --constraint=mil
 #SBATCH --account=g2538
 #SBATCH --partition=preops
 
