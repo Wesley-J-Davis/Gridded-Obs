@@ -53,7 +53,7 @@ set STORAGE_DIR = ${Storage_Base}/Y$YYYY/M$MM
 mkdir -p $WorkDir
 mkdir -p $STORAGE_DIR
 if ( $MM == "02" ) then
-   set num_check=`/usr/bin/perl /home/dao_ops/bin/tick ${YYYYMM}${DAY_TABLE[$MM]}`
+   set num_check=`/usr/bin/perl /home/dao_ops/bin/tick ${YYYY}${MM}${DAY_TABLE[$MM]}`
    set check_num=`echo $num_check | cut -c 7-8`
    echo $check_num
    if ( "$check_num" == "29" ) then
@@ -64,13 +64,13 @@ endif
 set DAY_MAX = $DAY_TABLE[$MM] 
 cd $WorkDir
 
-if ( $Day < 10 ) then
-   set Day = 0$Day
-endif
-
 if ( $Day > $DAY_MAX ) then
     echo "Day $Day exceeds days in month $MM. Exiting."
     exit 0
+endif
+
+if ( $Day < 10 ) then
+   set Day = 0$Day
 endif
 
 set Date = ${YYYY}${MM}${Day}
