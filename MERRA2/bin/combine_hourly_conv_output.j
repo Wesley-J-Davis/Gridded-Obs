@@ -40,6 +40,10 @@ set OBRATE_TABLE   = ${RC_DIR}/obrate_conv_product_table.csv
 
 set YYYY = `echo $NYMD | cut -c1-4`
 set   MM = `echo $NYMD | cut -c5-6`
+set   DD = `echo $NYMD | cut -c7-8`
+set TODAY = "${YYYY}-${MM}-${DD}"
+set YESTERDAY = `/usr/bin/perl /home/dao_ops/bin/tick $NYMD 000000 -1 0 | cut -d' ' -f1 | sed 's/\(....\)\(..\)\(..\)/\1-\2-\3/'`
+set TOMORROW = `/usr/bin/perl /home/dao_ops/bin/tick $NYMD 000000 1 0 | cut -d' ' -f1 | sed 's/\(....\)\(..\)\(..\)/\1-\2-\3/'`
 #NYMD=YYYYMMDD
 set CurrentMonth_FirstDay  = ${YYYY}${MM}01
 set PreviousMonth_LastDay = `/usr/bin/perl /home/dao_ops/bin/tick ${CurrentMonth_FirstDay} 000000 -1 0 | cut -d' ' -f1`
@@ -230,32 +234,32 @@ foreach HOUR ( `echo $SYNOP_TABLE` )
         
         if ( $HOUR  == "00" ) then
             echo "00"
-            set  begin_date = ${PreviousMonth_LastDay}
-            set  end_date = ${CurrentMonth_LastDay}
+            set  begin_date = ${YESTERDAY}
+            set  end_date = ${TODAY}
             set  begin_time = "21:00:00.000000"
             set  end_time = "02:59:59.999999"
 	    set HOUR0   = "21"
 
         else if ( $HOUR == "06" ) then
             echo "06"
-            set  begin_date=${CurrentMonth_FirstDay}
-            set  end_date = ${CurrentMonth_LastDay}
+            set  begin_date=${TODAY}
+            set  end_date = ${TODAY}
             set  begin_time = "03:00:00.000000"
             set  end_time = "08:59:59.999999"
             set HOUR0   = "03"
 
         else if ( $HOUR == 12 ) then
             echo "12"
-            set  begin_date = ${CurrentMonth_FirstDay}
-            set  end_date = ${CurrentMonth_LastDay}
+            set  begin_date = ${TODAY}
+            set  end_date = ${TODAY}
             set  begin_time = "09:00:00.000000"
             set  end_time = "14:59:59.999999"
             set HOUR0   = "09"
 
         else if ( $HOUR == 18 ) then
             echo "18"
-            set  begin_date = ${CurrentMonth_FirstDay}
-            set  end_date = ${CurrentMonth_LastDay}
+            set  begin_date = ${TODAY}
+            set  end_date = ${TODAY}
             set  begin_time = "15:00:00.000000"
             set  end_time = "20:59:59.999999"
             set HOUR0   = "15"
@@ -266,8 +270,8 @@ foreach HOUR ( `echo $SYNOP_TABLE` )
             set HOUR0   = "00"
             set  granule = "$OUT_DIR/merra2.${INSTRUMENT}.${NYMD}.nc4"
             set  granuleid = merra2.${INSTRUMENT}.${NYMD}.nc4
-            set  begin_date = ${PreviousMonth_LastDay}
-            set  end_date = ${CurrentMonth_LastDay}
+            set  begin_date = ${YESTERDAY}
+            set  end_date = ${TODAY}
             set  begin_time = "21:00:00.000000"
             set  end_time = "20:59:59.999999"
             echo $granule
@@ -317,12 +321,12 @@ foreach HOUR ( `echo $SYNOP_TABLE` )
             -a RangeEndingDate,global,o,c,"${end_date}" \
             -a RangeEndingTime,global,o,c,"${end_time}" \
             -a begin_time,time,o,c,"${HOUR0}:00:00" \
-            -a begin_date,time,o,c,${CurrentMonth_FirstDay} \
+            -a begin_date,time,o,c,${begin_date} \
             -a standard_name,time,o,c,"time" \
             -a standard_name,lat,o,c,"latitude" \
             -a standard_name,lon,o,c,"longitude" \
             -a calendar,time,o,c,"standard" \
-            -a units,time,o,c,"minutes since ${CurrentMonth_FirstDay} ${HOUR0}:00:00"
+            -a units,time,o,c,"minutes since ${begin_date} ${HOUR0}:00:00"
 
 	     ${RootDir}/bin/run_n4zip.csh $granule
     endif   # skipping meta data

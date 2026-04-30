@@ -6,17 +6,19 @@
 #SBATCH --partition=datamove
 
 set echo
+
+
+set YEAR_TABLE = $1
+set SYNOP_TABLE = $2
+set ExpID = $3
+
 set YYYY = `echo $YEAR_TABLE | cut -c 1-4`
 
 
 set WORK_DIR   = /discover/nobackup/projects/gmao/merra2/data/obs/.WORK/raw_obs_wjd
-set OBS_DIR     = /home/dao_ops/$ExpID/run/.../archive/obs
-#set OBS_DIR     = /discover/nobackup/projects/gmao/merra2/data/obs_dmf/GEOSadas-5_12_4/$ExpID/obs/
+#set OBS_DIR     = /home/dao_ops/$ExpID/run/.../archive/obs
+set OBS_DIR     = /discover/nobackup/projects/gmao/merra2/data/obs_dmf/GEOSadas-5_12_4/$ExpID/obs/
 set STORAGE_DIR = /discover/nobackup/projects/gmao/merra2/data/obs/.WORK/products_wjd
-
-#set INSTRUMENT_TABLE = "airs_aqua"
-#set INSTRUMENT_TABLE = `cat  $RC_DIR/instrument.list`
-#set YEAR_TABLE = ( 201802 )
 
 foreach Date ( `echo $YEAR_TABLE` )
         echo " ------ START TIME ------  " $Date
@@ -40,14 +42,8 @@ foreach Date ( `echo $YEAR_TABLE` )
                         if ( $Hour == all ) then
                                 ls -1 $OBS_DIR/Y$YYYY/M$MM/*ods
                                 set ods_Files = `ls -1 $OBS_DIR/Y$YYYY/M$MM/*ods`
-                                #${INSTRUMENT}*ods`
                                 set syn_tag = ""
                         else
-				ls $OBS_DIR
-                                ls $OBS_DIR/Y$YYYY
-                                ls $OBS_DIR/Y$YYYY/M$MM
-                                ls $OBS_DIR/Y${YYYY}/M${MM}/D*
-                                ls $OBS_DIR/Y${YYYY}/M${MM}/D*/H${Hour}
                                 ls $OBS_DIR/Y${YYYY}/M${MM}/D*/H${Hour}/*${INSTRUMENT}*
 
                                 ls -1 $OBS_DIR/Y${YYYY}/M${MM}/D*/H${Hour}/*${INSTRUMENT}*${Hour}z*ods
@@ -58,9 +54,10 @@ foreach Date ( `echo $YEAR_TABLE` )
                         echo $ods_Files
                         foreach FILE ( $ods_Files )
                                 echo $FILE
-				dmget $FILE 
-				wait
+				#dmget $FILE 
+				#wait
                                 rsync -av $FILE $WORK_DIR/$INSTRUMENT/$Date
+                                wait
                 end
         end
 end
