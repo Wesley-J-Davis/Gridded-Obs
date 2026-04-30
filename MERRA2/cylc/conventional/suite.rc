@@ -179,7 +179,10 @@
             --export = ALL
             --nodes = 1
             --ntasks = 3          # Gives you 3 cores to run obs, omf(ges), omf(anl) concurrently
-            --mem-per-cpu = 2G    # Tunable parameter 
+            --mem-per-cpu = 2G    # Tunable parameter
+            --array = 1-31%7   # Run up to 7 days at a time
+
+ 
 
     [[process_synop_06]]
         pre-script = "source $BIN_DIR/.g5_modules.sh; module load nco"
