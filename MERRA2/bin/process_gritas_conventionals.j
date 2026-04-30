@@ -67,45 +67,36 @@ cd $WorkDir
 if ( $Day < 10 ) then
    set Day = 0$Day
 endif
+
+if ( $Day > $DAY_MAX ) then
+    echo "Day $Day exceeds days in month $MM. Exiting."
+    exit 0
+endif
+
 set Date = ${YYYY}${MM}${Day}
 set DayDir        = $STORAGE_DIR/D${Day}
 echo "DayDir $DayDir"
 mkdir -p ${DayDir}
+
 set DateHr = ${YYYY}${MM}${Day}_${Hour}z.bin
 set out_fileo   = gritaso${Hour}
 /bin/rm -f ${out_fileo}.{bias,stdv,nobs}.nc4
-                        # Print MPI and resource information
-                        #echo "Starting MPI statistical calculations at `date`"
-                        #echo "Number of MPI processes: $SLURM_NTASKS"
-                        #echo "Processes per node: $SLURM_NTASKS_PER_NODE"
-                        #echo "Available memory: `free -h`"
-                        #mpirun -np $SLURM_NTASKS 
-			$gritas -obs -o $out_fileo $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr &
+$gritas -obs -o $out_fileo $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr &
 
 set out_filef   = gritasf${Hour}
 /bin/rm -f ${out_filef}.{bias,stdv,nobs}.hdf
-                        # Print MPI and resource information
-                        #echo "Starting MPI statistical calculations at `date`"
-                        #echo "Number of MPI processes: $SLURM_NTASKS"
-                        #echo "Processes per node: $SLURM_NTASKS_PER_NODE"
-                        #echo "Available memory: `free -h`"
-                        #mpirun -np $SLURM_NTASKS 
 $gritas -omf -o $out_filef $Gritas_Core_Opt ${ExpID}.diag_conv_ges.$DateHr &
       
 set out_filea   = gritasa${Hour}
 /bin/rm -f ${out_filea}.{bias,stdv,nobs}.hdf
-                        ## THIS ONE NEEDS TO BE OMF, DON'T CHANGE TO OMA
-                        # Print MPI and resource information
-                        #echo "Starting MPI statistical calculations at `date`"
-                        #echo "Number of MPI processes: $SLURM_NTASKS"
-                        #echo "Processes per node: $SLURM_NTASKS_PER_NODE"
-                        #echo "Available memory: `free -h`"
-                        #mpirun -np $SLURM_NTASKS 
+## THIS ONE NEEDS TO BE OMF, DON'T CHANGE TO OMA
 $gritas -omf -o $out_filea $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr &
 wait
-      # clean the work dir for that day of any pre-existing files for that synoptic time
-      # move recently created gritas output to holding directory
-      # n4zip compresses and sets permissions
+
+# clean the work dir for that day of any pre-existing files for that synoptic time
+# move recently created gritas output to holding directory
+# n4zip compresses and sets permissions
+
 /bin/rm -f ${DayDir}/*${Hour}z*nc4*pid*.tmp
 /bin/rm -f ${DayDir}/*${Hour}z*.nc4 
 
