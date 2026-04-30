@@ -24,44 +24,44 @@ set grmeans = ${BinDir}/GFIO_mean_r8.x
 # Set defaults for options
 # ------------------------
 set TRUE = 1; set FALSE = 0 
-set Result  = means
+#set Result  = means
  
 # Set options defined by user, if any
 # -----------------------------------
-set ReqArgv = ()
-while ( $#argv > 0 )
-  switch ( $argv[1] )
-     case -r:
-        set Result =  $argv[2]; shift
-        echo $Result
-        breaksw
+#set ReqArgv = ()
+#while ( $#argv > 0 )
+#  switch ( $argv[1] )
+#     case -r:
+#        set Result =  $argv[2]; shift
+#        echo $Result
+#        breaksw
 #       case -o:
 #          set OutBaseName = $argv[2]
 #          shift
 #          breaksw
-       
-     default:
-        set FirstChar = `echo $argv[1] | awk '{ print substr ($1,1,1)}'`
-        if ( FirstChar == "-" ) then
-                           # Any other option produces an error
-           echo "Illegal option "$argv[1]
-           goto err
-        else               # ... or is a required argument
-           set ReqArgv = ($ReqArgv $argv[1])
-        endif
-    endsw
-    shift
-end
+#       
+#     default:
+#        set FirstChar = `echo $argv[1] | awk '{ print substr ($1,1,1)}'`
+#        if ( FirstChar == "-" ) then
+#                           # Any other option produces an error
+#           echo "Illegal option "$argv[1]
+#           goto err
+#        else               # ... or is a required argument
+#           set ReqArgv = ($ReqArgv $argv[1])
+#        endif
+#    endsw
+#    shift
+#end
 
 # Get required parameters
 # -----------------------
 #  if ( $#ReqArgv < 2 ) goto err
-if ( $#ReqArgv < 1 ) goto err
+#if ( $#ReqArgv < 1 ) goto err
 
 #  set ExpID  = $ReqArgv[1]; shift ReqArgv
 #  set ExpID  = d5124_m2_jan10
 set ExpID  = merra2
-set Date   = $ReqArgv[1]; shift ReqArgv
+set Date   = $1
 set Year   = `echo $Date | awk '{print substr($1,1,4)}'`
 set Month  = `echo $Date | awk '{print substr($1,5,2)}'`
 
@@ -87,44 +87,43 @@ endif
 
 cd $Dir/Y$Year/M$Month
 pwd
-echo $Result
-
-# Implement result option
-# -----------------------
-if      ( $Result == "means" ) then
-   set Options       = ""
-   set InFile_Result = "mean"
-else if ( $Result == "rms"   ) then
-   set Options       = "-rms"
-   set InFile_Result = "stdv"
-else if ( $Result == "obrate"  ) then
-   set Options       = ""
-   set InFile_Result = "nobs"
-else
-   echo "Invalid assignment for the variable Result (=$Result)"
-   goto err
-endif
-
 set Quants   = ( obs omf oma )
 set SynTimes = ( 00 06 12 18 )
 #  set SynTimes = ( `echo $SYNOP_TABLE` )
 set OutFiles = ""
-foreach Quant ( $Quants )
-   set OutFile  = $ExpID.mon_${Result}_${Quant}.${Year}${Month}.nc4
-   /bin/rm -f $OutFile
-   echo $OutFile
-   set InFiles  = `ls ./D*/$ExpID.${InFile_Result}3d_${Quant}_p.${Year}${Month}*_*z.nc4`
-   echo $InFiles
-   set OutFiles = ( $OutFiles $OutFile )
-   $grmeans $Options -inc 060000 $InFiles -o $OutFile &
 
-   foreach SynTime ( $SynTimes )
-      set OutFile  = $ExpID.mon_${Result}_${Quant}.${Year}${Month}_${SynTime}z.nc4
-      /bin/rm -f $OutFile
-      set InFiles  = `ls ./D*/$ExpID.${InFile_Result}3d_${Quant}_p.${Year}${Month}*_${SynTime}z.nc4`
-      set OutFiles = ( $OutFiles $OutFile )
-      $grmeans $Options  -inc 060000 $InFiles -o $OutFile &
-   end
+foreach Result ( means rms obrate )
+  if      ( $Result == "means" ) then
+    set Options       = ""
+    set InFile_Result = "mean"
+  else if ( $Result == "rms"   ) then
+    set Options       = "-rms"
+    set InFile_Result = "stdv"
+  else if ( $Result == "obrate"  ) then
+    set Options       = ""
+    set InFile_Result = "nobs"
+  else
+    echo "Invalid assignment for the variable Result (=$Result)"
+    goto err
+  endif
+
+  foreach Quant ( $Quants )
+     set OutFile  = $ExpID.mon_${Result}_${Quant}.${Year}${Month}.nc4
+     /bin/rm -f $OutFile
+     echo $OutFile
+     set InFiles  = `ls ./D*/$ExpID.${InFile_Result}3d_${Quant}_p.${Year}${Month}*_*z.nc4`
+     echo $InFiles
+     set OutFiles = ( $OutFiles $OutFile )
+     $grmeans $Options -inc 060000 $InFiles -o $OutFile &
+
+     foreach SynTime ( $SynTimes )
+        set OutFile  = $ExpID.mon_${Result}_${Quant}.${Year}${Month}_${SynTime}z.nc4
+        /bin/rm -f $OutFile
+        set InFiles  = `ls ./D*/$ExpID.${InFile_Result}3d_${Quant}_p.${Year}${Month}*_${SynTime}z.nc4`
+        set OutFiles = ( $OutFiles $OutFile )
+        $grmeans $Options  -inc 060000 $InFiles -o $OutFile &
+     end
+  end
 end
 wait
 
