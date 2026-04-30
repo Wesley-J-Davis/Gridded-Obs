@@ -23,7 +23,6 @@ set YEAR_TABLE = $1
 set INSTRUMENT_TABLE = 'conv'
 set Hour = $2
 set ExpID = $3
-set Day = $4
 
 set YYYY = `echo $YEAR_TABLE | cut -c 1-4`
 set MM   = `echo $YEAR_TABLE | cut -c 5-6`
@@ -63,57 +62,83 @@ endif
 
 set DAY_MAX = $DAY_TABLE[$MM] 
 cd $WorkDir
+set Day0 = 1
+while ( $Day0 <= $DAY_MAX )
+   set Day = $Day0
 
-if ( $Day > $DAY_MAX ) then
-    echo "Day $Day exceeds days in month $MM. Exiting."
-    exit 0
-endif
+   if ( $Day > $DAY_MAX ) then
+       echo "Day $Day exceeds days in month $MM. Exiting."
+       exit 0
+   endif
 
-if ( $Day < 10 ) then
-   set Day = 0$Day
-endif
+   if ( $Day < 10 ) then
+      set Day = 0$Day
+   endif
 
-set Date = ${YYYY}${MM}${Day}
-set DayDir        = $STORAGE_DIR/D${Day}
-echo "DayDir $DayDir"
-mkdir -p ${DayDir}
+   set Date = ${YYYY}${MM}${Day}
+   set DayDir        = $STORAGE_DIR/D${Day}
+   echo "DayDir $DayDir"
+   mkdir -p ${DayDir}
 
-set DateHr = ${YYYY}${MM}${Day}_${Hour}z.bin
-set out_fileo   = gro${Day}${Hour}
-/bin/rm -f ${out_fileo}.{bias,stdv,nobs}.nc4
-$gritas -obs -o $out_fileo $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr &
+   set DateHr = ${YYYY}${MM}${Day}_${Hour}z.bin
+   set out_fileo   = gro${Day}${Hour}
+   /bin/rm -f ${out_fileo}.{bias,stdv,nobs}.nc4
+   $gritas -obs -o $out_fileo $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr &
 
-set out_filef   = grf${Day}${Hour}
-/bin/rm -f ${out_filef}.{bias,stdv,nobs}.hdf
-$gritas -omf -o $out_filef $Gritas_Core_Opt ${ExpID}.diag_conv_ges.$DateHr &
+   set out_filef   = grf${Day}${Hour}
+   /bin/rm -f ${out_filef}.{bias,stdv,nobs}.hdf
+   $gritas -omf -o $out_filef $Gritas_Core_Opt ${ExpID}.diag_conv_ges.$DateHr &
       
-set out_filea   = gra${Day}${Hour}
-/bin/rm -f ${out_filea}.{bias,stdv,nobs}.hdf
-## THIS ONE NEEDS TO BE OMF, DON'T CHANGE TO OMA
-$gritas -omf -o $out_filea $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr &
-wait
+   set out_filea   = gra${Day}${Hour}
+   /bin/rm -f ${out_filea}.{bias,stdv,nobs}.hdf
+   ## THIS ONE NEEDS TO BE OMF, DON'T CHANGE TO OMA
+   $gritas -omf -o $out_filea $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr &
+   @ Day0 = $Day0 + 1
+end
+wait #for all of the month's task to execute. Max is 93 which is less than 126 cores, so all will work on one node.
+echo "All gritas calculations finished."
 
 # clean the work dir for that day of any pre-existing files for that synoptic time
 # move recently created gritas output to holding directory
 # n4zip compresses and sets permissions
+echo "Starting cleanup and compression..."
+set Day0 = 1
 
-/bin/rm -f ${DayDir}/*${Hour}z*nc4*pid*.tmp
-/bin/rm -f ${DayDir}/*${Hour}z*.nc4 
+while ( $Day0 <= $DAY_MAX )
+   set Day = $Day0
+   if ( $Day0 < 10 ) then
+      set Day = 0$Day0
+   endif
+   set Date = ${YYYY}${MM}${Day}
+   set DayDir = $STORAGE_DIR/D${Day}
 
-mv ${out_fileo}.bias.hdf ${DayDir}/$TAG.mean3d_obs_p.${Date}_${Hour}z.nc4
-mv ${out_fileo}.stdv.hdf ${DayDir}/$TAG.stdv3d_obs_p.${Date}_${Hour}z.nc4
-mv ${out_fileo}.nobs.hdf ${DayDir}/$TAG.nobs3d_obs_p.${Date}_${Hour}z.nc4
+   set out_fileo = gro${Day}${Hour}
+   set out_filef = grf${Day}${Hour}
+   set out_filea = gra${Day}${Hour}
+   # Clean the work dir for that day of any pre-existing files for that synop time
+   /bin/rm -f ${DayDir}/*${Hour}z*nc4*pid*.tmp
+   /bin/rm -f ${DayDir}/*${Hour}z*.nc4 
+   # Move OBS
+   mv ${out_fileo}.bias.hdf ${DayDir}/$TAG.mean3d_obs_p.${Date}_${Hour}z.nc4
+   mv ${out_fileo}.stdv.hdf ${DayDir}/$TAG.stdv3d_obs_p.${Date}_${Hour}z.nc4
+   mv ${out_fileo}.nobs.hdf ${DayDir}/$TAG.nobs3d_obs_p.${Date}_${Hour}z.nc4
 
-mv ${out_filef}.bias.hdf ${DayDir}/$TAG.mean3d_omf_p.${Date}_${Hour}z.nc4
-mv ${out_filef}.stdv.hdf ${DayDir}/$TAG.stdv3d_omf_p.${Date}_${Hour}z.nc4
-mv ${out_filef}.nobs.hdf ${DayDir}/$TAG.nobs3d_omf_p.${Date}_${Hour}z.nc4
+   # Move OMF (GES)
+   mv ${out_filef}.bias.hdf ${DayDir}/$TAG.mean3d_omf_p.${Date}_${Hour}z.nc4
+   mv ${out_filef}.stdv.hdf ${DayDir}/$TAG.stdv3d_omf_p.${Date}_${Hour}z.nc4
+   mv ${out_filef}.nobs.hdf ${DayDir}/$TAG.nobs3d_omf_p.${Date}_${Hour}z.nc4
 
-mv ${out_filea}.bias.hdf ${DayDir}/$TAG.mean3d_oma_p.${Date}_${Hour}z.nc4
-mv ${out_filea}.stdv.hdf ${DayDir}/$TAG.stdv3d_oma_p.${Date}_${Hour}z.nc4
-mv ${out_filea}.nobs.hdf ${DayDir}/$TAG.nobs3d_oma_p.${Date}_${Hour}z.nc4
+   # Move OMF (ANL)
+   mv ${out_filea}.bias.hdf ${DayDir}/$TAG.mean3d_oma_p.${Date}_${Hour}z.nc4
+   mv ${out_filea}.stdv.hdf ${DayDir}/$TAG.stdv3d_oma_p.${Date}_${Hour}z.nc4
+   mv ${out_filea}.nobs.hdf ${DayDir}/$TAG.nobs3d_oma_p.${Date}_${Hour}z.nc4
 
-nohup  $n4zip_file ${DayDir}/$TAG*mean3d*${Date}_${Hour}*.nc4
-nohup  $n4zip_file ${DayDir}/$TAG*stdv3d*${Date}_${Hour}*.nc4
-nohup  $n4zip_file ${DayDir}/$TAG*nobs3d*${Date}_${Hour}*.nc4
-
+   # Launch compression in the background for super-fast zipping
+   $n4zip_file ${DayDir}/$TAG*mean3d*${Date}_${Hour}*.nc4 &
+   $n4zip_file ${DayDir}/$TAG*stdv3d*${Date}_${Hour}*.nc4 &
+   $n4zip_file ${DayDir}/$TAG*nobs3d*${Date}_${Hour}*.nc4 &
+   @ Day0 = $Day0 + 1
+end
+wait #for all files to be zipped
+echo "Cleanup and compression complete. Data location:\n"
 echo $STORAGE_DIR
