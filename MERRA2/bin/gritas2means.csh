@@ -136,4 +136,8 @@ wait
 # All is well
 # ----------- 
 exit 0
-
+# Error handling
+# --------------
+err:
+  echo "gritas2means.csh failed."
+  exit 1
