@@ -34,8 +34,16 @@ set BinDir = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS/GrI
 #set BinDir = $BIN_DIR
 setenv TAG   merra2
 set RES      = 'd'
+
+if ( $INSTRUMENT == "o3lev_aura" ) then
+    set Gritas_Core_Opt  = "-nlevs 48 -rc $RC_File -res $RES -ncf -ospl -lb -nopassive"
+else
+    set Gritas_Core_Opt  = "-rc $RC_File -res $RES -ospl -lb -nopassive"
+    #      PASSIVE TEST
+    #  set Gritas_Core_Opt  = "-rc $RC_File -res $RES -ospl -lb "
+endif
 #set Gritas_Core_Opt  = "-nlevs 106 -rc $RC_File -hdf -res $RES -ncf -ospl -lb -nopassive"
-set Gritas_Core_Opt  = "-nlevs 50 -rc $RC_File -res d -ospl -lb -nopassive"
+#set Gritas_Core_Opt  = "-nlevs 50 -rc $RC_File -res d -ospl -lb -nopassive"
 set gritas  = ${BinDir}/gritas.x
 set grmeans = ${BinDir}/GFIO_mean_r8.x
 
@@ -67,25 +75,25 @@ set ods_Files = `ls -1 ${DataDir}/*.diag_${INSTRUMENT}.${Date}*_${SYNOP_TABLE}z.
 set syn_tag = "_${SYNOP_TABLE}z"
 echo $ods_Files
 
-set out_fileo   = $DataDir/gritaso${NYMD}${SYNOP_TABLE}
+set out_fileo   = gritaso${NYMD}${SYNOP_TABLE}
 /bin/rm -f ${out_fileo}.{bias,stdv,nobs}.nc4
 $gritas -obs -o $out_fileo $Gritas_Core_Opt ${ods_Files} &
 wait
 
 #    ... for o-f data
-set out_filef   = $DataDir/gritasf${NYMD}${SYNOP_TABLE}
+set out_filef   = gritasf${NYMD}${SYNOP_TABLE}
 /bin/rm -f ${out_filef}.{bias,stdv,nobs}.nc4
 $gritas -omf -o $out_filef $Gritas_Core_Opt ${ods_Files} &
 wait
 
 #    ... for o-a data
-set out_filea   = $DataDir/gritasa${NYMD}${SYNOP_TABLE}
+set out_filea   = gritasa${NYMD}${SYNOP_TABLE}
 /bin/rm -f ${out_filea}.{bias,stdv,nobs}.nc4
 $gritas -oma -o $out_filea $Gritas_Core_Opt ${ods_Files} &
 wait
 
 #    ... for bias data
-set out_fileb   = $DataDir/gritasb${NYMD}${SYNOP_TABLE}
+set out_fileb   = gritasb${NYMD}${SYNOP_TABLE}
 /bin/rm -f ${out_fileb}.{bias,stdv,nobs}.nc4
 $gritas -obias -o $out_fileb $Gritas_Core_Opt ${ods_Files} &
 wait
@@ -139,16 +147,16 @@ $EXE_DIR/run_ncrcat.csh ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_bias_p.${Date}${syn_
 /discover/nobackup/projects/gmao/share/gmao_ops/opengrads/Contents//lats4d.sh -i ${out_fileb}.stdv.nc4 -o ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_bias_p.${Date}${syn_tag} -zrev
 $EXE_DIR/run_ncrcat.csh ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_bias_p.${Date}${syn_tag}.nc
 
-if ( -e ${DayDir}/$TAG.${INSTRUMENT}.mean3d_obs_p.${YYYY}${MM}${syn_tag}.nc ) then
-    mv -f ${DayDir}/$TAG.${INSTRUMENT}.mean3d_obs_p.${YYYY}${MM}${syn_tag}.nc  ${DayDir}/$TAG.${INSTRUMENT}.mean3d_obs_p.${YYYY}${MM}${syn_tag}.nc4
+if ( -e ${DayDir}/$TAG.${INSTRUMENT}.mean3d_obs_p.${Date}${syn_tag}.nc ) then
+    mv -f ${DayDir}/$TAG.${INSTRUMENT}.mean3d_obs_p.${Date}${syn_tag}.nc  ${DayDir}/$TAG.${INSTRUMENT}.mean3d_obs_p.${Date}${syn_tag}.nc4
 else
-    mv -f ${out_fileo}.bias.nc4 ${DayDir}/$TAG.${INSTRUMENT}.mean3d_obs_p.${YYYY}${MM}${syn_tag}.nc4
+    mv -f ${out_fileo}.bias.nc4 ${DayDir}/$TAG.${INSTRUMENT}.mean3d_obs_p.${Date}${syn_tag}.nc4
 endif
     
-if ( -e ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_obs_p.${YYYY}${MM}${syn_tag}.nc ) then
-    mv -f ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_obs_p.${YYYY}${MM}${syn_tag}.nc  ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_obs_p.${YYYY}${MM}${syn_tag}.nc4
+if ( -e ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_obs_p.${Date}${syn_tag}.nc ) then
+    mv -f ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_obs_p.${Date}${syn_tag}.nc  ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_obs_p.${Date}${syn_tag}.nc4
 else
-    mv -f ${out_fileo}.nobs.nc4 ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_obs_p.${YYYY}${MM}${syn_tag}.nc4
+    mv -f ${out_fileo}.nobs.nc4 ${DayDir}/$TAG.${INSTRUMENT}.nobs3d_obs_p.${Date}${syn_tag}.nc4
 endif
      
 if ( -e ${DayDir}/$TAG.${INSTRUMENT}.stdv3d_obs_p.${Date}${syn_tag}.nc ) then
