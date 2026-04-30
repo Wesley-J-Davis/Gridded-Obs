@@ -320,9 +320,11 @@
         
         [[[job]]]
             batch system = slurm
-            execution time limit = PT2H
+            execution time limit = PT45M
         [[[directives]]]
             --export = ALL
+            --nodes = 1
+            --ntasks = 15  
 
     [[metric_means]]
         pre-script = "source $BIN_DIR/.g5_modules.sh"
@@ -340,9 +342,11 @@
         
         [[[job]]]
             batch system = slurm
-            execution time limit = PT2H
+            execution time limit = PT45M
         [[[directives]]]
             --export = ALL
+            --nodes = 1
+            --ntasks = 15  
 
     [[metric_rms]]
         pre-script = "source $BIN_DIR/.g5_modules.sh"
@@ -360,9 +364,11 @@
         
         [[[job]]]
             batch system = slurm
-            execution time limit = PT2H
+            execution time limit = PT45M
         [[[directives]]]
             --export = ALL
+            --nodes = 1
+            --ntasks = 15  
 
     [[combine_job_00]]
         script = """
