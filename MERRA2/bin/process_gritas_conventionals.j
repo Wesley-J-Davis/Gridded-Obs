@@ -79,15 +79,15 @@ echo "DayDir $DayDir"
 mkdir -p ${DayDir}
 
 set DateHr = ${YYYY}${MM}${Day}_${Hour}z.bin
-set out_fileo   = gritaso${Hour}
+set out_fileo   = gro${Day}${Hour}
 /bin/rm -f ${out_fileo}.{bias,stdv,nobs}.nc4
 $gritas -obs -o $out_fileo $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr &
 
-set out_filef   = gritasf${Hour}
+set out_filef   = grf${Day}${Hour}
 /bin/rm -f ${out_filef}.{bias,stdv,nobs}.hdf
 $gritas -omf -o $out_filef $Gritas_Core_Opt ${ExpID}.diag_conv_ges.$DateHr &
       
-set out_filea   = gritasa${Hour}
+set out_filea   = gra${Day}${Hour}
 /bin/rm -f ${out_filea}.{bias,stdv,nobs}.hdf
 ## THIS ONE NEEDS TO BE OMF, DON'T CHANGE TO OMA
 $gritas -omf -o $out_filea $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr &
