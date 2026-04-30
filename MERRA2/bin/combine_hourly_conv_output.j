@@ -44,7 +44,6 @@ set   DD = `echo $NYMD | cut -c7-8`
 set TODAY = "${YYYY}-${MM}-${DD}"
 set YESTERDAY = `/usr/bin/perl /home/dao_ops/bin/tick $NYMD 000000 -1 0 | cut -d' ' -f1 | sed 's/\(....\)\(..\)\(..\)/\1-\2-\3/'`
 set TOMORROW = `/usr/bin/perl /home/dao_ops/bin/tick $NYMD 000000 1 0 | cut -d' ' -f1 | sed 's/\(....\)\(..\)\(..\)/\1-\2-\3/'`
-set  = `echo $date_str | sed 's/\(....\)\(..\)\(..\)/\1-\2-\3/'`
 #NYMD=YYYYMMDD
 set CurrentMonth_FirstDay  = ${YYYY}${MM}01
 set PreviousMonth_LastDay = `/usr/bin/perl /home/dao_ops/bin/tick ${CurrentMonth_FirstDay} 000000 -1 0 | cut -d' ' -f1`
