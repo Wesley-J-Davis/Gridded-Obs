@@ -557,6 +557,12 @@
 
         DD=$(printf "%02d" $DAY)
         NYMD=${YEAR_TABLE}${DD}
+        
+        # Skip if day exceeds month length
+        if [ $DAY -gt $DAYS_IN_MONTH ]; then
+            echo "Skipping array task ${SLURM_ARRAY_TASK_ID}: Day ${DAY} exceeds ${DAYS_IN_MONTH} days in month"
+            exit 0
+        fi
 
         export IN_DIR=${HOST_DIR}/conv/d/Y${YYYY}/M${MM}/D${DD}
         export OUT_DIR=${STORAGE_DIR}/conv/d/Y${YYYY}/M${MM}/D${DD}
@@ -570,7 +576,7 @@
 
         [[[job]]]
             batch system = slurm
-            execution time limit = PT15M
+            execution time limit = PT45M
         [[[directives]]]
             --nodes = 1
             --ntasks-per-node = 1
