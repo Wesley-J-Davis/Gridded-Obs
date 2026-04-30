@@ -119,7 +119,7 @@ foreach YYYYMM ( `echo $YEAR_TABLE` )
                         #echo "Available memory: `free -h`"
                         #mpirun -np $SLURM_NTASKS 
 			$gritas -omf -o $out_filea $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr &
-      
+      wait
       # clean the work dir for that day of any pre-existing files for that synoptic time
       # move recently created gritas output to holding directory
       # n4zip compresses and sets permissions
