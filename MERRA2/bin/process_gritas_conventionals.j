@@ -63,6 +63,8 @@ endif
 set DAY_MAX = $DAY_TABLE[$MM] 
 cd $WorkDir
 set Day0 = 1
+set batch_count = 0
+
 while ( $Day0 <= $DAY_MAX )
    set Day = $Day0
 
@@ -83,19 +85,25 @@ while ( $Day0 <= $DAY_MAX )
    set DateHr = ${YYYY}${MM}${Day}_${Hour}z.bin
    set out_fileo   = gro${Day}${Hour}
    /bin/rm -f ${out_fileo}.{bias,stdv,nobs}.nc4
-   $gritas -obs -o $out_fileo $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr &
+   $gritas -obs -o $out_fileo $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr > ${CYLC_TASK_WORK_DIR}/$out_fileo.log & 
 
    set out_filef   = grf${Day}${Hour}
    /bin/rm -f ${out_filef}.{bias,stdv,nobs}.hdf
-   $gritas -omf -o $out_filef $Gritas_Core_Opt ${ExpID}.diag_conv_ges.$DateHr &
-      
+   $gritas -omf -o $out_filef $Gritas_Core_Opt ${ExpID}.diag_conv_ges.$DateHr > ${CYLC_TASK_WORK_DIR}/$out_filef.log &
+
    set out_filea   = gra${Day}${Hour}
    /bin/rm -f ${out_filea}.{bias,stdv,nobs}.hdf
    ## THIS ONE NEEDS TO BE OMF, DON'T CHANGE TO OMA
-   $gritas -omf -o $out_filea $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr &
+   $gritas -omf -o $out_filea $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr > ${CYLC_TASK_WORK_DIR}/$out_filea.log &
+
    @ Day0 = $Day0 + 1
+   @ batch_count = $batch_count + 1
+   if ( $batch_count == 5 ) then
+      wait # for batch of 5 days to finish
+      set batch_count = 0
+      echo "At $Day. Finished a batch of 5 days. Moving to next..."
+   endif
 end
-wait #for all of the month's task to execute. Max is 93 which is less than 126 cores, so all will work on one node.
 echo "All gritas calculations finished."
 
 # clean the work dir for that day of any pre-existing files for that synoptic time
@@ -103,6 +111,7 @@ echo "All gritas calculations finished."
 # n4zip compresses and sets permissions
 echo "Starting cleanup and compression..."
 set Day0 = 1
+set zip_batch = 0
 
 while ( $Day0 <= $DAY_MAX )
    set Day = $Day0
@@ -134,11 +143,16 @@ while ( $Day0 <= $DAY_MAX )
    mv ${out_filea}.nobs.hdf ${DayDir}/$TAG.nobs3d_oma_p.${Date}_${Hour}z.nc4
 
    # Launch compression in the background for super-fast zipping
-   $n4zip_file ${DayDir}/$TAG*mean3d*${Date}_${Hour}*.nc4 &
-   $n4zip_file ${DayDir}/$TAG*stdv3d*${Date}_${Hour}*.nc4 &
-   $n4zip_file ${DayDir}/$TAG*nobs3d*${Date}_${Hour}*.nc4 &
+   $n4zip_file ${DayDir}/$TAG*mean3d*${Date}_${Hour}*.nc4  &
+   $n4zip_file ${DayDir}/$TAG*stdv3d*${Date}_${Hour}*.nc4  &
+   $n4zip_file ${DayDir}/$TAG*nobs3d*${Date}_${Hour}*.nc4  &
    @ Day0 = $Day0 + 1
+   @ zip_batch = $zip_batch + 1
+   # Throttle: Wait for 10 days of compression to finish before starting the next 10
+   if ( $zip_batch == 10 ) then
+      wait
+      set zip_batch = 0
+   endif
 end
-wait #for all files to be zipped
 echo "Cleanup and compression complete. Data location:\n"
 echo $STORAGE_DIR
