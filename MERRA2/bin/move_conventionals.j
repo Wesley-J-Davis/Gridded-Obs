@@ -18,7 +18,6 @@ set OBS_DIR     = /discover/nobackup/projects/gmao/merra2/data/obs_dmf/GEOSadas-
 #set OBS_DIR     = /home/dao_ops/$ExpID/run/.../archive/obs
 
 mkdir -p $WORK_DIR
-set MISSING_LOG = "$WORK_DIR/missing_files.log"
 
 echo " ------ START TIME ------  " $Date
 date
@@ -39,13 +38,6 @@ if ( "$ods_Files" == "" ) then
   exit 1   # continue  # Skip to next iteration, or use 'exit 1' to stop script
 endif
 foreach FILE ( $ods_Files )
-  if ( ! -e "$FILE" ) then
-    echo "Missing: $FILE"
-    # Append the missing filename to the log
-    echo "$FILE" >> $MISSING_LOG
-    # Skip to the next file
-    continue
-  endif
   echo $FILE
   #dmget $FILE
   #wait
