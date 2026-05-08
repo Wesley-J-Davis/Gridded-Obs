@@ -31,6 +31,8 @@ set RC_DIR	= /home/dao_ops/operations/GIT-OPS/Gridded-Obs/MERRA2/etc
 set RC_File  =  ${RC_DIR}/rc_files2/gritas_upconv_merra2.rc
 set RES      = 'd'
 set Gritas_Core_Opt  = "-nlevs 106 -rc $RC_File -hdf -res $RES -ncf -ospl -lb -nopassive"
+set Gritas_Alt_Opt   = "-nlevs 106 -rc $RC_File -hdf -res $RES -ncf -ospl -lb -nopassive"
+
 #set Gritas_Core_Opt  = "-nlevs 50 -rc $RC_File -res d -ncf -ospl -lb -nopassive"
 
 set WorkRootDir  =  /discover/nobackup/projects/gmao/merra2/data/obs/.WORK
@@ -82,8 +84,9 @@ while ( $Day0 <= $DAY_MAX )
    set DayDir        = $STORAGE_DIR/D${Day}
    echo "DayDir $DayDir"
    mkdir -p ${DayDir}
-
+   # d5124_m2_jan91.diag_conv.19920414_12z.ods
    set DateHr = ${YYYY}${MM}${Day}_${Hour}z.bin
+   set ODSDateHr = ${YYYY}${MM}${Day}_${Hour}z.ods
    set out_fileo   = gro${Day}${Hour}
    set out_filea   = gra${Day}${Hour}
    /bin/rm -f ${out_fileo}.{bias,stdv,nobs}.nc4
@@ -93,7 +96,10 @@ while ( $Day0 <= $DAY_MAX )
      echo "Missing: $FILE"
      # Append the missing filename to the log
      echo "$FILE" >> $MISSING_LOG
+     if ( ! -e "${ExpID}.diag_conv_anl.$DateHr" ) then
      ## alternate gritas call with ods files
+     $gritas -obs -o $out_fileo $Gritas_Alt_Opt ${ExpID}.diag_conv.$ODSDateHr > ${CYLC_TASK_WORK_DIR}/$out_fileo.log &
+     $gritas -oma -o $out_filea $Gritas_Alt_Opt ${ExpID}.diag_conv.$ODSDateHr > ${CYLC_TASK_WORK_DIR}/$out_filea.log &
      continue
    else
      $gritas -obs -o $out_fileo $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr > ${CYLC_TASK_WORK_DIR}/$out_fileo.log & 
