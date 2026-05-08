@@ -10,7 +10,7 @@
     [[dependencies]]
         [[[P1M]]]  # Monthly cycling - runs 4 synoptic times per month
             graph = """
-                move_job => process_job => monthly_metrics => combine_job & hourly_jobs
+                move_job => process_job_00 & process_job_06 & process_job_12 & process_job_18 => monthly_metrics => combine_job & hourly_jobs
             """
 
 [runtime]
@@ -46,11 +46,18 @@
         echo "Processing synoptic time: $SYNOP for $YEAR_TABLE"
         for SYNOP in 00 06 12 18; do
             echo "Processing synoptic time: $SYNOP for $YEAR_TABLE"
-            ${SCRIPT_DIR}/move_conventionals.j $YEAR_TABLE $SYNOP $ExpID
-            wait
-            
+            ${SCRIPT_DIR}/move_conventionals.j $YEAR_TABLE $SYNOP $ExpID  > ${CYLC_TASK_WORK_DIR}/${SYNOP}.log &
         done        
         """
+
+        [[[job]]]
+            batch system = slurm
+            execution time limit = PT30M
+        [[[directives]]]
+            --export = ALL
+            --nodes = 1
+            --partition = compute
+
 
     [[process_job]]
         pre-script = "source $BIN_DIR/.g5_modules.sh; module load nco"
@@ -66,32 +73,32 @@
         
         # Determine ExpID
         if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
-            export ExpID=d5124_m2_jan79
+            export ExpID=d5124_m2_jan79 
         elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
-            export ExpID=d5124_m2_jan91
+            export ExpID=d5124_m2_jan91 
         elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
-            export ExpID=d5124_m2_jan00
+            export ExpID=d5124_m2_jan00 
         elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
             export ExpID=d5124_m2_jan10
-        fi
+        fi      
         
-        echo "Processing synoptic time: $SYNOP for $YEAR_TABLE"
-        for SYNOP in 00 06 12 18; do
+        for SYNOP in 00 06 12 18; do 
             echo "Processing synoptic time: $SYNOP for $YEAR_TABLE"
-            ${SCRIPT_DIR}/process_gritas_conventionals.j $YEAR_TABLE $SYNOP $ExpID
+            ${SCRIPT_DIR}/process_gritas_conventionals.j $YEAR_TABLE $SYNOP $ExpID  > ${CYLC_TASK_WORK_DIR}/${SYNOP}.log
             
-            # Note: The .j script already has a 'wait' inside it, so it will naturally 
+            # Note: The .j script already has a 'wait' inside it, so it will naturally
             # finish all 93 tasks for 00z before moving on to 06z.
-        done        
+        done
         """
         
-        [[[job]]]
-            batch system = slurm
-            execution time limit = PT1H
+        [[[job]]] 
+            batch system = slurm 
+            execution time limit = PT30M
         [[[directives]]]
             --export = ALL
             --nodes = 1
-            --partition = preops
+            --partition = compute
+
 
     [[monthly_metrics]]
         pre-script = "source $BIN_DIR/.g5_modules.sh"
@@ -103,8 +110,7 @@
         
         YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
         
-        echo "Processing metric: obrate for $YEAR_TABLE"
-        ${SCRIPT_DIR}/process_conv_means.j $YEAR_TABLE
+        ${SCRIPT_DIR}/process_conv_means.j $YEAR_TABLE  > ${CYLC_TASK_WORK_DIR}/means.log 
         """
         
         [[[job]]]
@@ -142,8 +148,10 @@
         for SYNOP in 00 06 12 18 all; do
             echo "Combining synoptic time: $SYNOP for $YEAR_TABLE"
             # Execute the combine script with synoptic time as argument
-            ${SCRIPT_DIR}/combine_conv_output.j $YEAR_TABLE $SYNOP
+            ${SCRIPT_DIR}/combine_conv_output.j $YEAR_TABLE $SYNOP  > ${CYLC_TASK_WORK_DIR}/${SYNOP}.log &
         done
+        wait
+        echo "gritas processing done"
         """
         
         [[[job]]]
