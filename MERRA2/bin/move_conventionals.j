@@ -6,10 +6,11 @@
 #SBATCH --partition=datamove
 
 set echo
-set YEAR_TABLE = $1
+set nonomatch
+set Date  = $1
 set SYNOP = $2
 set ExpID = $3
-set INSTRUMENT_TABLE = "conv"
+set INSTRUMENT = "conv"
 set YYYY = `echo $YEAR_TABLE | cut -c 1-4`
 
 set WORK_DIR   = /discover/nobackup/projects/gmao/merra2/data/obs/.WORK/raw_obs_wjd
@@ -17,32 +18,36 @@ set OBS_DIR     = /discover/nobackup/projects/gmao/merra2/data/obs_dmf/GEOSadas-
 #set OBS_DIR     = /home/dao_ops/$ExpID/run/.../archive/obs
 
 mkdir -p $WORK_DIR
+set MISSING_LOG = "$WORK_DIR/missing_files.log"
 
-foreach Date ( `echo $YEAR_TABLE` )
-        echo " ------ START TIME ------  " $Date
-                    date
-        echo " ---------------------------"
-        set YYYY = `echo $Date | cut -c 1-4`
-        set   MM = `echo $Date | cut -c 5-6`
-        foreach INSTRUMENT ( `echo $INSTRUMENT_TABLE` )
-                set RES     = "d"
-                mkdir -p $WORK_DIR/$INSTRUMENT/$Date
-                #cd $WORK_DIR/$INSTRUMENT
-                foreach Hour ( $SYNOP  )
-                        set ods_Files = `ls -1 $OBS_DIR/Y$YYYY/M$MM/D*/H${Hour}/*${INSTRUMENT}*`                   # d5124_m2_jan10.diag_conv.20180101_00z.ods
-                        echo $ods_Files
-                        # Check if ods_Files is empty
-                        if ( "$ods_Files" == "" ) then
-                                echo "ERROR: No files found for instrument $INSTRUMENT on $Date at hour $Hour"
-                                echo "Search path: $OBS_DIR/Y$YYYY/M$MM/D*/H${Hour}/*${INSTRUMENT}*"
-                                exit 1   # continue  # Skip to next iteration, or use 'exit 1' to stop script
-                        endif
-                        foreach FILE ( $ods_Files )
-                                echo $FILE
-				#dmget $FILE
-				#wait
-                                rsync -av $FILE $WORK_DIR/$INSTRUMENT/$Date
-                        end
-                end
-        end
+echo " ------ START TIME ------  " $Date
+date
+echo " ---------------------------"
+
+set YYYY = `echo $Date | cut -c 1-4`
+set   MM = `echo $Date | cut -c 5-6`
+set RES     = "d"
+
+mkdir -p $WORK_DIR/$INSTRUMENT/$Date
+set ods_Files = `ls -1 $OBS_DIR/Y$YYYY/M$MM/D*/H${SYNOP}/*${INSTRUMENT}*`                   # d5124_m2_jan10.diag_conv.20180101_00z.ods
+echo $ods_Files
+
+# Check if ods_Files is empty
+if ( "$ods_Files" == "" ) then
+  echo "ERROR: No files found for instrument $INSTRUMENT on $Date at hour $Hour"
+  echo "Search path: $OBS_DIR/Y$YYYY/M$MM/D*/H${Hour}/*${INSTRUMENT}*"
+  exit 1   # continue  # Skip to next iteration, or use 'exit 1' to stop script
+endif
+foreach FILE ( $ods_Files )
+  if ( ! -e "$FILE" ) then
+    echo "Missing: $FILE"
+    # Append the missing filename to the log
+    echo "$FILE" >> $MISSING_LOG
+    # Skip to the next file
+    continue
+  endif
+  echo $FILE
+  #dmget $FILE
+  #wait
+  rsync -avL $FILE $WORK_DIR/$INSTRUMENT/$Date
 end
