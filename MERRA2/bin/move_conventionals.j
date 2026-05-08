@@ -42,6 +42,7 @@ foreach Date ( `echo $YEAR_TABLE` )
 				#dmget $FILE
 				#wait
                                 rsync -av $FILE $WORK_DIR/$INSTRUMENT/$Date
+                        end
                 end
         end
 end
