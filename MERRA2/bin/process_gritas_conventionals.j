@@ -95,7 +95,7 @@ while ( $Day0 <= $DAY_MAX )
    /bin/rm -f ${out_filea}.{bias,stdv,nobs}.hdf
    ## THIS ONE NEEDS TO BE OMF, DON'T CHANGE TO OMA
    $gritas -omf -o $out_filea $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr > ${CYLC_TASK_WORK_DIR}/$out_filea.log &
-
+   
    @ Day0 = $Day0 + 1
    @ batch_count = $batch_count + 1
    if ( $batch_count == 5 ) then
@@ -104,6 +104,7 @@ while ( $Day0 <= $DAY_MAX )
       echo "At $Day. Finished a batch of 5 days. Moving to next..."
    endif
 end
+wait
 echo "All gritas calculations finished."
 
 # clean the work dir for that day of any pre-existing files for that synoptic time
@@ -149,10 +150,11 @@ while ( $Day0 <= $DAY_MAX )
    @ Day0 = $Day0 + 1
    @ zip_batch = $zip_batch + 1
    # Throttle: Wait for 10 days of compression to finish before starting the next 10
-   if ( $zip_batch == 10 ) then
+   if ( $zip_batch == 2 ) then
       wait
       set zip_batch = 0
    endif
 end
+wait
 echo "Cleanup and compression complete. Data location:\n"
 echo $STORAGE_DIR
