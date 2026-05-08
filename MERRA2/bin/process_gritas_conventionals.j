@@ -23,7 +23,6 @@ set YEAR_TABLE = $1
 set INSTRUMENT_TABLE = 'conv'
 set Hour = $2
 set ExpID = $3
-
 set YYYY = `echo $YEAR_TABLE | cut -c 1-4`
 set MM   = `echo $YEAR_TABLE | cut -c 5-6`
 
@@ -53,20 +52,24 @@ set WorkDir     = ${Work_Base}/${YEAR_TABLE}
 set STORAGE_DIR = ${Storage_Base}/Y$YYYY/M$MM
 mkdir -p $WorkDir
 mkdir -p $STORAGE_DIR
+
+set MM_idx = `echo $MM | awk '{print $1 + 0}'`
 if ( $MM == "02" ) then
-   set num_check=`/usr/bin/perl /home/dao_ops/bin/tick ${YYYY}${MM}${DAY_TABLE[$MM]}`
+   set num_check=`/usr/bin/perl /home/dao_ops/bin/tick ${YYYY}${MM}${DAY_TABLE[$MM_idx]}`
    set check_num=`echo $num_check | cut -c 7-8`
    echo $check_num
    if ( "$check_num" == "29" ) then
       set DAY_TABLE = ( 31 29 31 30 31 30 31 31 30 31 30 31 )
    endif
 endif 
-
-set DAY_MAX = $DAY_TABLE[$MM] 
+set DAY_MAX = $DAY_TABLE[$MM_idx] 
 cd $WorkDir
 set Day0 = 1
 set batch_count = 0
 set MISSING_LOG = "$CYLC_TASK_WORK_DIR/missing_files.log"
+if ( ! -e $MISSING_LOG ) then
+  touch $MISSING_LOG
+endif
 
 while ( $Day0 <= $DAY_MAX )
    set Day = $Day0
@@ -93,14 +96,18 @@ while ( $Day0 <= $DAY_MAX )
    /bin/rm -f ${out_filea}.{bias,stdv,nobs}.hdf
 
    if ( ! -e "${ExpID}.diag_conv_anl.$DateHr" ) then
-     echo "Missing: $FILE"
+     echo "Missing: ${ExpID}.diag_conv_anl.$DateHr"
      # Append the missing filename to the log
-     echo "$FILE" >> $MISSING_LOG
-     if ( ! -e "${ExpID}.diag_conv_anl.$DateHr" ) then
-     ## alternate gritas call with ods files
-     $gritas -obs -o $out_fileo $Gritas_Alt_Opt ${ExpID}.diag_conv.$ODSDateHr > ${CYLC_TASK_WORK_DIR}/$out_fileo.log &
-     $gritas -oma -o $out_filea $Gritas_Alt_Opt ${ExpID}.diag_conv.$ODSDateHr > ${CYLC_TASK_WORK_DIR}/$out_filea.log &
-     continue
+     echo "${ExpID}.diag_conv_anl.$DateHr" >> $MISSING_LOG
+     if ( ! -e "${ExpID}.diag_conv.$ODSDateHr" ) then
+       echo "Missing: ${ExpID}.diag_conv.$ODSDateHr"
+       # Append the missing filename to the log
+       echo "${ExpID}.diag_conv.$ODSDateHr" >> $MISSING_LOG
+     else
+       ## alternate gritas call with ods files
+       $gritas -obs -o $out_fileo $Gritas_Alt_Opt ${ExpID}.diag_conv.$ODSDateHr > ${CYLC_TASK_WORK_DIR}/$out_fileo.log &
+       $gritas -oma -o $out_filea $Gritas_Alt_Opt ${ExpID}.diag_conv.$ODSDateHr > ${CYLC_TASK_WORK_DIR}/$out_filea.log &
+     endif
    else
      $gritas -obs -o $out_fileo $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr > ${CYLC_TASK_WORK_DIR}/$out_fileo.log & 
      ## THIS ONE NEEDS TO BE OMF, DON'T CHANGE TO OMA
@@ -111,11 +118,19 @@ while ( $Day0 <= $DAY_MAX )
    /bin/rm -f ${out_filef}.{bias,stdv,nobs}.hdf
 
    if ( ! -e "${ExpID}.diag_conv_ges.$DateHr" ) then
-     echo "Missing: $FILE"
+     echo "Missing: ${ExpID}.diag_conv_ges.$DateHr"
      # Append the missing filename to the log
-     echo "$FILE" >> $MISSING_LOG
-     ## alternate gritas call with ods files
-     continue
+     echo "${ExpID}.diag_conv_ges.$DateHr" >> $MISSING_LOG
+     if ( ! -e "${ExpID}.diag_conv.$ODSDateHr" ) then
+       echo "Missing: ${ExpID}.diag_conv.$ODSDateHr"
+       grep -Fq "${ExpID}.diag_conv.$ODSDateHr" $MISSING_LOG
+       if ( $status != 0 ) then
+         # Append the missing filename to the log
+         echo "${ExpID}.diag_conv.$ODSDateHr" >> $MISSING_LOG
+       endif
+     else     
+       $gritas -omf -o $out_filef $Gritas_Core_Opt ${ExpID}.diag_conv.$ODSDateHr > ${CYLC_TASK_WORK_DIR}/$out_filef.log &
+     endif
    else
      $gritas -omf -o $out_filef $Gritas_Core_Opt ${ExpID}.diag_conv_ges.$DateHr > ${CYLC_TASK_WORK_DIR}/$out_filef.log &
    endif
@@ -154,19 +169,19 @@ while ( $Day0 <= $DAY_MAX )
    /bin/rm -f ${DayDir}/*${Hour}z*nc4*pid*.tmp
    /bin/rm -f ${DayDir}/*${Hour}z*.nc4 
    # Move OBS
-   mv ${out_fileo}.bias.hdf ${DayDir}/$TAG.mean3d_obs_p.${Date}_${Hour}z.nc4
-   mv ${out_fileo}.stdv.hdf ${DayDir}/$TAG.stdv3d_obs_p.${Date}_${Hour}z.nc4
-   mv ${out_fileo}.nobs.hdf ${DayDir}/$TAG.nobs3d_obs_p.${Date}_${Hour}z.nc4
+   if ( -e ${out_fileo}.bias.hdf ) mv ${out_fileo}.bias.hdf ${DayDir}/$TAG.mean3d_obs_p.${Date}_${Hour}z.nc4
+   if ( -e ${out_fileo}.stdv.hdf ) mv ${out_fileo}.stdv.hdf ${DayDir}/$TAG.stdv3d_obs_p.${Date}_${Hour}z.nc4
+   if ( -e ${out_fileo}.nobs.hdf ) mv ${out_fileo}.nobs.hdf ${DayDir}/$TAG.nobs3d_obs_p.${Date}_${Hour}z.nc4
 
    # Move OMF (GES)
-   mv ${out_filef}.bias.hdf ${DayDir}/$TAG.mean3d_omf_p.${Date}_${Hour}z.nc4
-   mv ${out_filef}.stdv.hdf ${DayDir}/$TAG.stdv3d_omf_p.${Date}_${Hour}z.nc4
-   mv ${out_filef}.nobs.hdf ${DayDir}/$TAG.nobs3d_omf_p.${Date}_${Hour}z.nc4
+   if ( -e ${out_filef}.bias.hdf ) mv ${out_filef}.bias.hdf ${DayDir}/$TAG.mean3d_omf_p.${Date}_${Hour}z.nc4
+   if ( -e ${out_filef}.stdv.hdf ) mv ${out_filef}.stdv.hdf ${DayDir}/$TAG.stdv3d_omf_p.${Date}_${Hour}z.nc4
+   if ( -e ${out_filef}.nobs.hdf ) mv ${out_filef}.nobs.hdf ${DayDir}/$TAG.nobs3d_omf_p.${Date}_${Hour}z.nc4
 
    # Move OMF (ANL)
-   mv ${out_filea}.bias.hdf ${DayDir}/$TAG.mean3d_oma_p.${Date}_${Hour}z.nc4
-   mv ${out_filea}.stdv.hdf ${DayDir}/$TAG.stdv3d_oma_p.${Date}_${Hour}z.nc4
-   mv ${out_filea}.nobs.hdf ${DayDir}/$TAG.nobs3d_oma_p.${Date}_${Hour}z.nc4
+   if ( -e ${out_filea}.bias.hdf ) mv ${out_filea}.bias.hdf ${DayDir}/$TAG.mean3d_oma_p.${Date}_${Hour}z.nc4
+   if ( -e ${out_filea}.stdv.hdf ) mv ${out_filea}.stdv.hdf ${DayDir}/$TAG.stdv3d_oma_p.${Date}_${Hour}z.nc4
+   if ( -e ${out_filea}.nobs.hdf ) mv ${out_filea}.nobs.hdf ${DayDir}/$TAG.nobs3d_oma_p.${Date}_${Hour}z.nc4
 
    # Launch compression in the background for super-fast zipping
    $n4zip_file ${DayDir}/$TAG*mean3d*${Date}_${Hour}*.nc4  &
