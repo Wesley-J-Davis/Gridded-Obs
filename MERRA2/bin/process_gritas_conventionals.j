@@ -64,6 +64,7 @@ set DAY_MAX = $DAY_TABLE[$MM]
 cd $WorkDir
 set Day0 = 1
 set batch_count = 0
+set MISSING_LOG = "$CYLC_TASK_WORK_DIR/missing_files.log"
 
 while ( $Day0 <= $DAY_MAX )
    set Day = $Day0
@@ -84,17 +85,35 @@ while ( $Day0 <= $DAY_MAX )
 
    set DateHr = ${YYYY}${MM}${Day}_${Hour}z.bin
    set out_fileo   = gro${Day}${Hour}
+   set out_filea   = gra${Day}${Hour}
    /bin/rm -f ${out_fileo}.{bias,stdv,nobs}.nc4
-   $gritas -obs -o $out_fileo $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr > ${CYLC_TASK_WORK_DIR}/$out_fileo.log & 
+   /bin/rm -f ${out_filea}.{bias,stdv,nobs}.hdf
+
+   if ( ! -e "${ExpID}.diag_conv_anl.$DateHr" ) then
+     echo "Missing: $FILE"
+     # Append the missing filename to the log
+     echo "$FILE" >> $MISSING_LOG
+     ## alternate gritas call with ods files
+     continue
+   else
+     $gritas -obs -o $out_fileo $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr > ${CYLC_TASK_WORK_DIR}/$out_fileo.log & 
+     ## THIS ONE NEEDS TO BE OMF, DON'T CHANGE TO OMA
+     $gritas -omf -o $out_filea $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr > ${CYLC_TASK_WORK_DIR}/$out_filea.log &
+   endif
 
    set out_filef   = grf${Day}${Hour}
    /bin/rm -f ${out_filef}.{bias,stdv,nobs}.hdf
-   $gritas -omf -o $out_filef $Gritas_Core_Opt ${ExpID}.diag_conv_ges.$DateHr > ${CYLC_TASK_WORK_DIR}/$out_filef.log &
 
-   set out_filea   = gra${Day}${Hour}
-   /bin/rm -f ${out_filea}.{bias,stdv,nobs}.hdf
-   ## THIS ONE NEEDS TO BE OMF, DON'T CHANGE TO OMA
-   $gritas -omf -o $out_filea $Gritas_Core_Opt ${ExpID}.diag_conv_anl.$DateHr > ${CYLC_TASK_WORK_DIR}/$out_filea.log &
+   if ( ! -e "${ExpID}.diag_conv_ges.$DateHr" ) then
+     echo "Missing: $FILE"
+     # Append the missing filename to the log
+     echo "$FILE" >> $MISSING_LOG
+     ## alternate gritas call with ods files
+     continue
+   else
+     $gritas -omf -o $out_filef $Gritas_Core_Opt ${ExpID}.diag_conv_ges.$DateHr > ${CYLC_TASK_WORK_DIR}/$out_filef.log &
+   endif
+
    
    @ Day0 = $Day0 + 1
    @ batch_count = $batch_count + 1
