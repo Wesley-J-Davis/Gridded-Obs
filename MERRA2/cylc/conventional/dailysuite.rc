@@ -1,0 +1,241 @@
+#!Jinja2
+[meta]
+    title = "Stitching in ods data"
+
+[scheduling]
+    initial cycle point = 1980-08-18T12Z
+    final cycle point   = 1980-08-18T12Z
+
+    [[graph]]
+        # 1. Main 6-Hourly Loop
+        PT6H = """
+            move_job => process_job
+        """
+
+        # 3. Monthly Processing (Triggers at 00:00 on the 1st of the month)
+        # Waits for the last day's average to finish
+        P1M = """
+            monthly_metrics => combine_job & hourly_jobs
+        """
+
+[runtime]
+    [[root]]
+        [[[environment]]]
+            CYCLE = ${CYLC_TASK_CYCLE_POINT}
+            STORAGE_DIR = /discover/nobackup/projects/gmao/merra2/data/obs/.WORK/products_revised
+            HOST_DIR = /discover/nobackup/projects/gmao/merra2/data/obs/.WORK/work_dir_wjd
+            SCRIPT_DIR = /home/dao_ops/operations/GIT-OPS/Gridded-Obs/MERRA2/bin
+            BIN_DIR = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS/GrITAS/Linux/bin
+
+    [[move_job]]
+    [[process_job]]
+
+[runtime]
+    [[root]]
+        [[[environment]]]
+            STORAGE_DIR = /discover/nobackup/projects/gmao/merra2/data/obs/.WORK/products_revised
+            HOST_DIR = /discover/nobackup/projects/gmao/merra2/data/obs/.WORK/work_dir_wjd
+            SCRIPT_DIR = /home/dao_ops/operations/GIT-OPS/Gridded-Obs/MERRA2/bin
+            BIN_DIR = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS/GrITAS/Linux/bin
+
+    [[move_job]]
+        script = """
+        set echo
+        
+        cd ${SCRIPT_DIR}
+        
+        # Extract synoptic time from cycle point (YYYYMMDDHH)
+        YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
+        YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
+        MM=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 5-6)
+        DD=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 7-8)
+        HH=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 9-10)
+
+        
+        # Determine ExpID based on year
+        if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
+            export ExpID=d5124_m2_jan79
+        elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
+            export ExpID=d5124_m2_jan91
+        elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
+            export ExpID=d5124_m2_jan00
+        elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
+            export ExpID=d5124_m2_jan10
+        fi
+        
+        echo "Processing synoptic time: $SYNOP for $YEAR_TABLE"
+        ${SCRIPT_DIR}/move_conventionals.j $YEAR_TABLE $DD $HH $ExpID  > ${CYLC_TASK_WORK_DIR}/${DD}${SYNOP}.log &
+        """
+
+        [[[job]]]
+            batch system = slurm
+            execution time limit = PT30M
+        [[[directives]]]
+            --export = ALL
+            --nodes = 1
+            --partition = compute
+
+
+    [[process_job]]
+        pre-script = "source $BIN_DIR/.g5_modules.sh; module load nco"
+        script = """
+        
+        set echo
+        
+        cd ${SCRIPT_DIR}
+        
+        # Extract synoptic time and date info
+        YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
+        YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
+        
+        # Determine ExpID
+        if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
+            export ExpID=d5124_m2_jan79 
+        elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
+            export ExpID=d5124_m2_jan91 
+        elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
+            export ExpID=d5124_m2_jan00 
+        elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
+            export ExpID=d5124_m2_jan10
+        fi      
+        
+        echo "Processing synoptic time: $SYNOP for $YEAR_TABLE"
+        ${SCRIPT_DIR}/process_gritas_conventionals.j $YEAR_TABLE $DD $HH $ExpID  > ${CYLC_TASK_WORK_DIR}/${DD}${SYNOP}.log
+            
+            # Note: The .j script already has a 'wait' inside it, so it will naturally
+            # finish all 93 tasks for 00z before moving on to 06z.
+        """
+        
+        [[[job]]] 
+            batch system = slurm 
+            execution time limit = PT59M
+        [[[directives]]]
+            --export = ALL
+            --nodes = 1
+            --partition = compute
+
+
+    [[monthly_metrics]]
+        pre-script = "source $BIN_DIR/.g5_modules.sh"
+        script = """
+        set -e
+        set -x
+        
+        cd ${SCRIPT_DIR}
+        
+        YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
+        
+        ${SCRIPT_DIR}/process_conv_means.j $YEAR_TABLE  > ${CYLC_TASK_WORK_DIR}/means.log 
+        """
+        
+        [[[job]]]
+            batch system = slurm
+            execution time limit = PT45M
+        [[[directives]]]
+            --export = ALL
+            --nodes = 1
+            --ntasks = 45  
+            --partition = preops
+
+
+    [[combine_job]]
+        script = """
+        set -e
+        set -x
+        
+        cd ${SCRIPT_DIR}
+        
+        # Extract synoptic time and date info
+        YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
+        YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
+        
+        # Determine ExpID
+        if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
+            export ExpID=d5124_m2_jan79
+        elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
+            export ExpID=d5124_m2_jan91
+        elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
+            export ExpID=d5124_m2_jan00
+        elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
+            export ExpID=d5124_m2_jan10
+        fi
+        
+        for SYNOP in 00 06 12 18 all; do
+            echo "Combining synoptic time: $SYNOP for $YEAR_TABLE"
+            # Execute the combine script with synoptic time as argument
+            ${SCRIPT_DIR}/combine_conv_output.j $YEAR_TABLE $SYNOP  > ${CYLC_TASK_WORK_DIR}/${SYNOP}.log &
+        done
+        wait
+        echo "gritas processing done"
+        """
+        
+        [[[job]]]
+            batch system = slurm
+            execution time limit = PT1H
+        [[[directives]]]
+            --nodes = 1
+            --partition = preops
+
+    [[hourly_jobs]]
+        script = """
+        set -e
+        set -x
+
+        cd ${SCRIPT_DIR}
+
+        YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
+        YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
+        MM=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 5-6)
+        mm=$((10#$MM))
+
+        # Determine ExpID
+        if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
+            export ExpID=d5124_m2_jan79
+        elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
+            export ExpID=d5124_m2_jan91
+        elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
+            export ExpID=d5124_m2_jan00
+        elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
+            export ExpID=d5124_m2_jan10
+        fi
+
+        # Calculate days in month
+        DAY_TABLE=(31 28 31 30 31 30 31 31 30 31 30 31)
+
+        if [ "$MM" == "02" ]; then
+            num_check=$(/usr/bin/perl /home/dao_ops/bin/tick ${YEAR_TABLE}${DAY_TABLE[$mm-1]})
+            check_num=$(echo $num_check | cut -c 7-8)
+            if [ "$check_num" == "29" ]; then
+                DAY_TABLE=(31 29 31 30 31 30 31 31 30 31 30 31)
+            fi
+        fi
+
+        export DAYS_IN_MONTH=${DAY_TABLE[$mm-1]}
+        export INSTRUMENT_TABLE=conv
+        for DAY in $(seq 1 $DAYS_IN_MONTH); do
+            DD=$(printf "%02d" $DAY)
+            NYMD=${YEAR_TABLE}${DD}
+            
+            export IN_DIR=${HOST_DIR}/conv/d/Y${YYYY}/M${MM}/D${DD}
+            export OUT_DIR=${STORAGE_DIR}/conv/d/Y${YYYY}/M${MM}/D${DD}
+            mkdir -p ${OUT_DIR}
+            chmod 755 ${OUT_DIR}
+
+            for SYNOP in 00 06 12 18; do
+                # Run the combine script in the background
+                /usr/bin/csh ${SCRIPT_DIR}/combine_hourly_conv_output.j ${NYMD} ${SYNOP} > ${CYLC_TASK_WORK_DIR}/${NYMD}.${SYNOP}.log 2>&1 &
+            done
+        done
+
+        # Wait for all ~124 tasks to finish!
+        wait
+        echo "All hourly combines finished."
+        """
+        
+        [[[job]]]
+            batch system = slurm
+            execution time limit = PT1H
+        [[[directives]]]
+            --nodes = 1
+            --partition = preops
+
