@@ -3,14 +3,14 @@
     title = "M2 Conv Obs"
 
 [scheduling]
-    initial cycle point = 19801201T00
-    final cycle point = 20240601T00
+    initial cycle point = 19900401T00
+    final cycle point   = 19900401T00
     runahead limit = P0
 
     [[dependencies]]
         [[[P1M]]]  # Monthly cycling - runs 4 synoptic times per month
             graph = """
-                move_job => process_job_00 & process_job_06 & process_job_12 & process_job_18 => monthly_metrics => combine_job & hourly_jobs
+                move_job => process_job => monthly_metrics => combine_job & hourly_jobs
             """
 
 [runtime]
@@ -28,7 +28,6 @@
         cd ${SCRIPT_DIR}
         
         # Extract synoptic time from cycle point (YYYYMMDDHH)
-        SYNOP="00"
         YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
         YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
         
@@ -43,7 +42,6 @@
             export ExpID=d5124_m2_jan10
         fi
         
-        echo "Processing synoptic time: $SYNOP for $YEAR_TABLE"
         for SYNOP in 00 06 12 18; do
             echo "Processing synoptic time: $SYNOP for $YEAR_TABLE"
             ${SCRIPT_DIR}/move_conventionals.j $YEAR_TABLE $SYNOP $ExpID  > ${CYLC_TASK_WORK_DIR}/${SYNOP}.log &
@@ -93,7 +91,7 @@
         
         [[[job]]] 
             batch system = slurm 
-            execution time limit = PT30M
+            execution time limit = PT59M
         [[[directives]]]
             --export = ALL
             --nodes = 1
