@@ -21,8 +21,8 @@ setenv TAG   merra2
 
 set YEAR_TABLE = $1 
 set INSTRUMENT_TABLE = 'conv'
-set Hour = $2
-set Day  = $3
+set Day = $2
+set Hour  = $3
 set ExpID = $4
 set YYYY = `echo $YEAR_TABLE | cut -c 1-4`
 set MM   = `echo $YEAR_TABLE | cut -c 5-6`
@@ -79,9 +79,6 @@ if ( $Day > $DAY_MAX ) then
   exit 0
 endif
 
-if ( $Day < 10 ) then
-  set Day = 0$Day
-endif
 
 set Date = ${YYYY}${MM}${Day}
 set DayDir        = $STORAGE_DIR/D${Day}
