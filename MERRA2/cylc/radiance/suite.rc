@@ -1,5 +1,5 @@
 [meta]
-    title = "MERRA2 Gridded Obs - Radiances"
+    title = "MERRA2 Gridded Obs - mhs_metop-a"
 
 [scheduling]
     initial cycle point = 20210601T0000
@@ -9,7 +9,7 @@
     [[dependencies]]
         [[[P1M]]]
             graph = """
-                move_jobs => process_jobs => combine_jobs
+                move_jobs 
             """
 
 [runtime]
@@ -19,7 +19,7 @@
             HOST_DIR = /discover/nobackup/projects/gmao/merra2/data/obs/.WORK/work_dir_wjd
             SCRIPT_DIR = /home/dao_ops/operations/GIT-OPS/Gridded-Obs/MERRA2/bin
             BIN_DIR = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS/GrITAS/Linux/bin
-            satellite = ssu_n14
+            INSTRUMENT_TABLE = mhs_metop-a
 
 
     [[move_jobs]]
@@ -57,24 +57,17 @@
         echo "Starting move_jobs script"
         echo "Current directory: $(pwd)"
         echo "CYLC_TASK_CYCLE_POINT: '${CYLC_TASK_CYCLE_POINT}'"
-        
-        DAY_TABLE=(31 28 31 30 31 30 31 31 30 31 30 31)
-        if [ "$mm" -eq "02" ]; then
-            num_check=$( /usr/bin/perl /home/dao_ops/bin/tick ${YEAR_TABLE}${DAY_TABLE[$mm-1]} )
-            check_num=$(echo $num_check | cut -c 7-8 )
-            echo $check_num
-            if [ $check_num -eq "29" ]; then
-                DAY_TABLE=(31 29 31 30 31 30 31 31 30 31 30 31 )
-            fi
-        fi
+        mkdir -p ${CYLC_TASK_WORK_DIR}
 
+        
         for SYNOP in 00 06 12 18; do
-            ${SCRIPT_DIR}/move_sat.j > ${CYLC_TASK_WORK_DIR}/${SYNOP}.log &
+            ${SCRIPT_DIR}/move_sat.j $YEAR_TABLE $SYNOP $ExpID > ${CYLC_TASK_WORK_DIR}/${SYNOP}.log &
         done
+        wait
 
         [[[job]]]
             batch system = slurm
-            execution time limit = PT30M
+            execution time limit = PT59M
             [[[directives]]]
                 --export = ALL
                 --nodes = 1
