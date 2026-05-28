@@ -8,8 +8,9 @@
 set echo
 set nonomatch
 set Date  = $1
-set SYNOP = $2
-set ExpID = $3
+set Day   = $2
+set SYNOP = $3
+set ExpID = $4
 set INSTRUMENT = "conv"
 set YYYY = `echo $YEAR_TABLE | cut -c 1-4`
 
@@ -28,7 +29,7 @@ set   MM = `echo $Date | cut -c 5-6`
 set RES     = "d"
 
 mkdir -p $WORK_DIR/$INSTRUMENT/$Date
-set ods_Files = `ls -1 $OBS_DIR/Y$YYYY/M$MM/D*/H${SYNOP}/*${INSTRUMENT}*`                   # d5124_m2_jan10.diag_conv.20180101_00z.ods
+set ods_Files = `ls -1 $OBS_DIR/Y$YYYY/M$MM/D${Day}/H${SYNOP}/*${INSTRUMENT}*`                   # d5124_m2_jan10.diag_conv.20180101_00z.ods
 echo $ods_Files
 
 # Check if ods_Files is empty
