@@ -15,6 +15,7 @@ set INSTRUMENT = conv
 set skip = 0
 set YYYY = `echo $NYMD | cut -c1-4`
 set   MM = `echo $NYMD | cut -c5-6`
+set   DD = `echo $NYMD | cut -c7-8`
 
 set TEMP_argv =  ( $argv )
 
@@ -234,50 +235,55 @@ foreach HOUR ( `echo $SYNOP_TABLE` )
         
         if ( $HOUR  == "00" ) then
             echo "00"
-            set  begin_date = ${PreviousMonth_LastDay}
-            set  end_date = ${CurrentMonth_LastDay}
+            if ( $DD  == "01" ) then
+                set  begin_date = ${PreviousMonth_LastDay}
+            else
+                set  begin_date = "${YYYY}-${MM}-${DD}"
+            endif
+
+            set  end_date = "${YYYY}-${MM}-${DD}"
             set  begin_time = "21:00:00.000000"
             set  end_time = "02:59:59.999999"
 	    set HOUR0   = "21"
 
         else if ( $HOUR == "06" ) then
             echo "06"
-            set  begin_date=${CurrentMonth_FirstDay}
-            set  end_date = ${CurrentMonth_LastDay}
+            set  begin_date = "${YYYY}-${MM}-${DD}"
+            set  end_date   = "${YYYY}-${MM}-${DD}"
             set  begin_time = "03:00:00.000000"
-            set  end_time = "08:59:59.999999"
+            set  end_time   = "08:59:59.999999"
             set HOUR0   = "03"
 
         else if ( $HOUR == 12 ) then
             echo "12"
-            set  begin_date = ${CurrentMonth_FirstDay}
-            set  end_date = ${CurrentMonth_LastDay}
+            set  begin_date = "${YYYY}-${MM}-${DD}"
+            set  end_date   = "${YYYY}-${MM}-${DD}"
             set  begin_time = "09:00:00.000000"
-            set  end_time = "14:59:59.999999"
+            set  end_time   = "14:59:59.999999"
             set HOUR0   = "09"
 
         else if ( $HOUR == 18 ) then
             echo "18"
-            set  begin_date = ${CurrentMonth_FirstDay}
-            set  end_date = ${CurrentMonth_LastDay}
+            set  begin_date = "${YYYY}-${MM}-${DD}"
+            set  end_date   = "${YYYY}-${MM}-${DD}"
             set  begin_time = "15:00:00.000000"
-            set  end_time = "20:59:59.999999"
+            set  end_time   = "20:59:59.999999"
             set HOUR0   = "15"
 
         endif
 
         if ( "$HOUR" == "all" ) then
             set HOUR0   = "00"
-            set  granule = "$RAM_DIR/merra2.${INSTRUMENT}.${NYMD}.nc4"
-            set  granuleid = merra2.${INSTRUMENT}.${NYMD}.nc4
+            set  granule    = "$RAM_DIR/merra2.${INSTRUMENT}.${NYMD}.nc4"
+            set  granuleid  = merra2.${INSTRUMENT}.${NYMD}.nc4
             set  begin_date = ${PreviousMonth_LastDay}
-            set  end_date = ${CurrentMonth_LastDay}
+            set  end_date   = ${CurrentMonth_LastDay}
             set  begin_time = "21:00:00.000000"
-            set  end_time = "20:59:59.999999"
+            set  end_time   = "20:59:59.999999"
             echo $granule
         else
-            set granule =  $RAM_DIR/merra2.${INSTRUMENT}.${NYMD}${SYNOP}.nc4
-            set granuleid = merra2.${INSTRUMENT}.${NYMD}${SYNOP}.nc4
+            set granule     = $RAM_DIR/merra2.${INSTRUMENT}.${NYMD}${SYNOP}.nc4
+            set granuleid   = merra2.${INSTRUMENT}.${NYMD}${SYNOP}.nc4
             echo $granule
         endif
         
