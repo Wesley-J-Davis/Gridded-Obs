@@ -3,9 +3,9 @@
     title = "M2 Conv Obs"
 
 [scheduling]
-    initial cycle point = 19900401T00
-    final cycle point   = 19900401T00
-    runahead limit = P0
+    initial cycle point = 19901201T00
+    final cycle point   = 20240601T00
+    runahead limit = P1
 
     [[dependencies]]
         [[[P1M]]]  # Monthly cycling - runs 4 synoptic times per month
@@ -27,11 +27,12 @@
         
         cd ${SCRIPT_DIR}
         
-        # Extract synoptic time from cycle point (YYYYMMDDHH)
+        # Extract synoptic time and date info
         YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
         YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
-        
-        # Determine ExpID based on year
+        MM=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 5-6)
+
+        # Determine ExpID
         if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
             export ExpID=d5124_m2_jan79
         elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
@@ -39,7 +40,17 @@
         elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
             export ExpID=d5124_m2_jan00
         elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
-            export ExpID=d5124_m2_jan10
+            if [[ $YYYY -eq 2021 ]]; then
+                # Force base-10 evaluation for MM to avoid octal errors on '08' and '09'
+                if [[ 10#$MM -ge 6 && 10#$MM -lt 12 ]]; then
+                    export ExpID=d5124_m2_jun21
+                else
+                    export ExpID=d5124_m2_jan10
+                fi
+            else
+                # Default for years 2010-2020 and 2022-2025
+                export ExpID=d5124_m2_jan10
+            fi
         fi
         
         for SYNOP in 00 06 12 18; do
@@ -54,7 +65,8 @@
         [[[directives]]]
             --export = ALL
             --nodes = 1
-            --partition = compute
+            --partition = datamove
+            --constraint = cas
 
 
     [[process_job]]
@@ -68,17 +80,28 @@
         # Extract synoptic time and date info
         YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
         YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
-        
+        MM=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 5-6)
+
         # Determine ExpID
         if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
-            export ExpID=d5124_m2_jan79 
+            export ExpID=d5124_m2_jan79
         elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
-            export ExpID=d5124_m2_jan91 
+            export ExpID=d5124_m2_jan91
         elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
-            export ExpID=d5124_m2_jan00 
+            export ExpID=d5124_m2_jan00
         elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
-            export ExpID=d5124_m2_jan10
-        fi      
+            if [[ $YYYY -eq 2021 ]]; then
+                # Force base-10 evaluation for MM to avoid octal errors on '08' and '09'
+                if [[ 10#$MM -ge 6 && 10#$MM -lt 12 ]]; then
+                    export ExpID=d5124_m2_jun21
+                else
+                    export ExpID=d5124_m2_jan10
+                fi
+            else
+                # Default for years 2010-2020 and 2022-2025
+                export ExpID=d5124_m2_jan10
+            fi
+        fi
         
         for SYNOP in 00 06 12 18; do 
             echo "Processing synoptic time: $SYNOP for $YEAR_TABLE"
@@ -95,7 +118,8 @@
         [[[directives]]]
             --export = ALL
             --nodes = 1
-            --partition = compute
+            --partition = preops
+            --constraint = mil
 
 
     [[monthly_metrics]]
@@ -113,12 +137,13 @@
         
         [[[job]]]
             batch system = slurm
-            execution time limit = PT45M
+            execution time limit = PT2H
         [[[directives]]]
             --export = ALL
             --nodes = 1
             --ntasks = 45  
             --partition = preops
+            --constraint = mil
 
 
     [[combine_job]]
@@ -131,7 +156,8 @@
         # Extract synoptic time and date info
         YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
         YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
-        
+        MM=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 5-6)
+
         # Determine ExpID
         if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
             export ExpID=d5124_m2_jan79
@@ -140,7 +166,17 @@
         elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
             export ExpID=d5124_m2_jan00
         elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
-            export ExpID=d5124_m2_jan10
+            if [[ $YYYY -eq 2021 ]]; then
+                # Force base-10 evaluation for MM to avoid octal errors on '08' and '09'
+                if [[ 10#$MM -ge 6 && 10#$MM -lt 12 ]]; then
+                    export ExpID=d5124_m2_jun21
+                else
+                    export ExpID=d5124_m2_jan10
+                fi
+            else
+                # Default for years 2010-2020 and 2022-2025
+                export ExpID=d5124_m2_jan10
+            fi
         fi
         
         for SYNOP in 00 06 12 18 all; do
@@ -158,6 +194,7 @@
         [[[directives]]]
             --nodes = 1
             --partition = preops
+            --constraint = mil
 
     [[hourly_jobs]]
         script = """
@@ -179,7 +216,17 @@
         elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
             export ExpID=d5124_m2_jan00
         elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
-            export ExpID=d5124_m2_jan10
+            if [[ $YYYY -eq 2021 ]]; then
+                # Force base-10 evaluation for MM to avoid octal errors on '08' and '09'
+                if [[ 10#$MM -ge 6 && 10#$MM -lt 12 ]]; then
+                    export ExpID=d5124_m2_jun21
+                else
+                    export ExpID=d5124_m2_jan10
+                fi
+            else
+                # Default for years 2010-2020 and 2022-2025
+                export ExpID=d5124_m2_jan10
+            fi
         fi
 
         # Calculate days in month
@@ -221,4 +268,5 @@
         [[[directives]]]
             --nodes = 1
             --partition = preops
+            --constraint = mil
 
