@@ -1,15 +1,15 @@
 [meta]
-    title = "M2 hirs4 n18 Obs"
+    title = "MERRA2 Gridded Obs - Radiances"
 
 [scheduling]
-    initial cycle point = 20090401T0000
-    final cycle point = 20251201T0000
+    initial cycle point = 20210601T0000
+    final cycle point   = 20211101T0000
+    runahead limit = P1
     
     [[dependencies]]
         [[[P1M]]]
             graph = """
-                debug => move_jobs => process_jobs => combine_jobs
-                combine_jobs[-P1M]:succeed => debug
+                move_jobs => process_jobs => combine_jobs
             """
 
 [runtime]
@@ -17,41 +17,24 @@
         [[[environment]]]
             STORAGE_DIR = /discover/nobackup/projects/gmao/merra2/data/obs/.WORK/products_revised
             HOST_DIR = /discover/nobackup/projects/gmao/merra2/data/obs/.WORK/work_dir_wjd
-            SCRIPT_DIR = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS/bin
+            SCRIPT_DIR = /home/dao_ops/operations/GIT-OPS/Gridded-Obs/MERRA2/bin
+            BIN_DIR = /discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS/GrITAS/Linux/bin
             satellite = ssu_n14
 
-    [[debug]]
-        script = """
-            echo "DEBUG: Running for cycle ${CYLC_TASK_CYCLE_POINT}"
-            echo "Initial point: ${CYLC_WORKFLOW_INITIAL_CYCLE_POINT}"
-            echo "Final point: ${CYLC_WORKFLOW_FINAL_CYCLE_POINT}"
-        """
 
     [[move_jobs]]
         script = """
-        set -e  
-        set -x  
+        set echo
         
-        echo "Starting move_jobs script"
-        echo "Current directory: $(pwd)"
-        echo "CYLC_TASK_CYCLE_POINT: '${CYLC_TASK_CYCLE_POINT}'"
+        cd ${SCRIPT_DIR}
         
-        # Check if directory exists before changing to it
-        TARGET_DIR="/discover/nobackup/dao_ops/TEST/M2_GRITAS/github_repo/M2_GRITAS/bin"
-        if [[ -d "$TARGET_DIR" ]]; then
-            echo "Directory exists, changing to: $TARGET_DIR"
-            cd "$TARGET_DIR"
-            echo "Successfully changed to: $(pwd)"
-        else
-            echo "ERROR: Directory does not exist: $TARGET_DIR"
-            exit 1
-        fi
-        SLURM_LOG_DIR=${CYLC_TASK_WORK_DIR}
-        move_job_ids=()
-        SYNOP_TIMES=(00 06 12 18)
-        echo $CYLC_TASK_CYCLE_POINT
+        # Extract synoptic time and date info
         YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
-        YYYY=$(echo $YEAR_TABLE | cut -c 1-4)
+        YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
+        MM=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 5-6)
+        mm=$(printf $((10#$MM )))
+
+        # Determine ExpID
         if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
             export ExpID=d5124_m2_jan79
         elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
@@ -59,180 +42,133 @@
         elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
             export ExpID=d5124_m2_jan00
         elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
-            export ExpID=d5124_m2_jan10
+            if [[ $YYYY -eq 2021 ]]; then
+                if [[ $mm -ge 6 && $mm -lt 12 ]]; then
+                    export ExpID=d5124_m2_jun21
+                else
+                    export ExpID=d5124_m2_jan10
+                fi
+            else
+                # Default for years 2010-2020 and 2022-2025
+                export ExpID=d5124_m2_jan10
+            fi
         fi
-        MM=$(echo $YEAR_TABLE | cut -c 5-6)
-        mm=$(printf $((10#$MM )))
-        YYYY=$(echo $YEAR_TABLE | cut -c 1-4)
+
+        echo "Starting move_jobs script"
+        echo "Current directory: $(pwd)"
+        echo "CYLC_TASK_CYCLE_POINT: '${CYLC_TASK_CYCLE_POINT}'"
+        
         DAY_TABLE=(31 28 31 30 31 30 31 31 30 31 30 31)
-        if [ "$MM" -eq "02" ]; then
-            num_check=$( /usr/bin/perl /home/dao_ops/bin/tick ${YEAR_TABLE}${DAY_TABLE[$MM-1]} )
+        if [ "$mm" -eq "02" ]; then
+            num_check=$( /usr/bin/perl /home/dao_ops/bin/tick ${YEAR_TABLE}${DAY_TABLE[$mm-1]} )
             check_num=$(echo $num_check | cut -c 7-8 )
             echo $check_num
             if [ $check_num -eq "29" ]; then
                 DAY_TABLE=(31 29 31 30 31 30 31 31 30 31 30 31 )
             fi
         fi
-        for synop in "${SYNOP_TIMES[@]}"; do
-            move_job=$(sbatch --parsable \
-                -J ${YEAR_TABLE}.${synop}.${satellite}.move \
-                -o ${SLURM_LOG_DIR}/${synop}.move.log \
-                --time=2:00:00 \
-                --nodes=1 \
-                --ntasks-per-node=1 \
-                --cpus-per-task=1 \
-                --export=YEAR_TABLE=${YEAR_TABLE},INSTRUMENT_TABLE=${satellite},SYNOP_TABLE=${synop},ExpID=$ExpID \
-                ${SCRIPT_DIR}/move_sat.j)
-            move_job_ids+=($move_job)
-            echo "    - Move job for SYNOP $synop: $move_job"
+
+        for SYNOP in 00 06 12 18; do
+            ${SCRIPT_DIR}/move_sat.j > ${CYLC_TASK_WORK_DIR}/${SYNOP}.log &
         done
 
-        move_deps=$(IFS=':'; echo "${move_job_ids[*]}")
-        echo "Waiting for jobs: $move_deps"
-
-        for job_id in "${move_job_ids[@]}"; do
-            while squeue -j $job_id >/dev/null 2>&1; do
-                sleep 30
-            done
-        done
-        echo "All move jobs completed"
-        """
         [[[job]]]
             batch system = slurm
-            execution time limit = PT2H
+            execution time limit = PT30M
             [[[directives]]]
-                --ntasks = 1
-                --cpus-per-task = 1
+                --export = ALL
+                --nodes = 1
+                --partition = datamove
+
 
     [[process_jobs]]
+        pre-script = "source $BIN_DIR/.g5_modules.sh; module load nco"
         script = """
-            set -x
-            cd ${SCRIPT_DIR}
-            process_job_ids=()
-            SYNOP_TIMES=(00 06 12 18)
-            export YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
-            YYYY=$(echo $YEAR_TABLE | cut -c 1-4)
-            if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
-                    export ExpID=d5124_m2_jan79
-            elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
-                    export ExpID=d5124_m2_jan91
-            elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
-                    export ExpID=d5124_m2_jan00
-            elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
+        set echo
+        cd ${SCRIPT_DIR}
+
+        # Extract synoptic time and date info
+        YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
+        YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
+        MM=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 5-6)
+        mm=$(printf $((10#$MM )))
+        DAY_TABLE=(31 28 31 30 31 30 31 31 30 31 30 31)
+
+        # Determine ExpID
+        if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
+            export ExpID=d5124_m2_jan79
+        elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
+            export ExpID=d5124_m2_jan91
+        elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
+            export ExpID=d5124_m2_jan00
+        elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
+            if [[ $YYYY -eq 2021 ]]; then
+                if [[ $mm -ge 6 && $mm -lt 12 ]]; then
+                    export ExpID=d5124_m2_jun21
+                else
                     export ExpID=d5124_m2_jan10
+                fi
+            else
+                # Default for years 2010-2020 and 2022-2025
+                export ExpID=d5124_m2_jan10
             fi
-            MM=$(echo $YEAR_TABLE | cut -c 5-6)
-            mm=$(printf $((10#$MM )))
-            YYYY=$(echo $YEAR_TABLE | cut -c 1-4)
-            DAY_TABLE=(31 28 31 30 31 30 31 31 30 31 30 31)
+        fi
 
-            if [ "$MM" -eq "02" ]; then
-                    num_check=$( /usr/bin/perl /home/dao_ops/bin/tick ${YEAR_TABLE}${DAY_TABLE[$MM-1]} )
-                    check_num=$(echo $num_check | cut -c 7-8 )
-                    echo $check_num
-                    if [ $check_num -eq "29" ]; then
-                        DAY_TABLE=(31 29 31 30 31 30 31 31 30 31 30 31 )
-                    fi
-            fi
+        if [ "$mm" -eq "02" ]; then
+                num_check=$( /usr/bin/perl /home/dao_ops/bin/tick ${YEAR_TABLE}${DAY_TABLE[$mm-1]} )
+                check_num=$(echo $num_check | cut -c 7-8 )
+                echo $check_num
+                if [ $check_num -eq "29" ]; then
+                    DAY_TABLE=(31 29 31 30 31 30 31 31 30 31 30 31 )
+                fi
+        fi
+        for SYNOP in 00 06 12 18 all; do 
+            echo "Processing synoptic time: $SYNOP for $YEAR_TABLE"
+                ${SCRIPT_DIR}/process_gritas_sat.j > ${CYLC_TASK_WORK_DIR}/${SYNOP}.log
+        done
 
-            SLURM_LOG_DIR=${CYLC_TASK_WORK_DIR}
-
-            for synop in "${SYNOP_TIMES[@]}"; do
-                process_job=$(sbatch --parsable \
-                    -J ${YEAR_TABLE}.${satellite}.${synop}.process \
-                    -o ${SLURM_LOG_DIR}/${synop}.process.log \
-                    --export=YEAR_TABLE=${YEAR_TABLE},INSTRUMENT_TABLE=${satellite},SYNOP_TABLE=${synop},ExpID=$ExpID \
-                    --time=1:00:00 \
-                    --nodes=1 \
-                    --ntasks-per-node=4 \
-                    --cpus-per-task=1 \
-                    ${SCRIPT_DIR}/process_gritas_sat.j)
-                process_job_ids+=($process_job)
-                echo "    - Process job for SYNOP $synop: $process_job"
-            done
-        
-            process_deps=$(IFS=':'; echo "${process_job_ids[*]}")
-
-            all_process_job=$(sbatch --parsable \
-                --dependency=afterok:${process_deps} \
-                -J ${YEAR_TABLE}.${satellite}.all.process \
-                -o ${SLURM_LOG_DIR}/all.process.log \
-                --export=YEAR_TABLE=${YEAR_TABLE},INSTRUMENT_TABLE=${satellite},SYNOP_TABLE=all,ExpID=$ExpID \
-                --time=1:00:00 \
-                --nodes=1 \
-                --ntasks-per-node=4 \
-                --cpus-per-task=1 \
-                ${SCRIPT_DIR}/process_gritas_sat.j)
-
-            echo "    - All-SYNOP process job: $all_process_job"
-
-            echo "Waiting for jobs: $process_deps"
-
-            while squeue -j $all_process_job >/dev/null 2>&1; do
-                sleep 30
-            done
-            echo "$all_process_job job completed"
 
         """
         [[[job]]]
             batch system = slurm
-            execution time limit = PT2H
-            [[[directives]]]
-                --ntasks = 1
-                --cpus-per-task = 1
+            execution time limit = PT59M
+            
+        [[[directives]]]
+            --export = ALL
+            --partition = preops
+            --constraint = mil
 
     [[combine_jobs]]
+        pre-script = "source $BIN_DIR/.g5_modules.sh; module load nco"
         script = """
                 set -x
                 cd ${SCRIPT_DIR}
-
-                SYNOP_TIMES=(00 06 12 18)
-                combine_job_ids=()
-                export YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
-                YYYY=$(echo $YEAR_TABLE | cut -c 1-4)
-                if [[ $YYYY -ge 1979 && $YYYY -lt 1991 ]]; then
-                        export ExpID=d5124_m2_jan79
-                elif [[ $YYYY -ge 1991 && $YYYY -lt 2000 ]]; then
-                        export ExpID=d5124_m2_jan91
-                elif [[ $YYYY -ge 2000 && $YYYY -lt 2010 ]]; then
-                        export ExpID=d5124_m2_jan00
-                elif [[ $YYYY -ge 2010 && $YYYY -lt 2026 ]]; then
-                        export ExpID=d5124_m2_jan10
-                fi
-                MM=$(echo $YEAR_TABLE | cut -c 5-6)
+                # Extract synoptic time and date info
+                YEAR_TABLE=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-6)
+                YYYY=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 1-4)
+                MM=$(echo ${CYLC_TASK_CYCLE_POINT} | cut -c 5-6)
                 mm=$(printf $((10#$MM )))
-                YYYY=$(echo $YEAR_TABLE | cut -c 1-4)
                 DAY_TABLE=(31 28 31 30 31 30 31 31 30 31 30 31)
 
-                if [ "$MM" -eq "02" ]; then
-                        num_check=$( /usr/bin/perl /home/dao_ops/bin/tick ${YEAR_TABLE}${DAY_TABLE[$MM-1]} )
+                if [ "$mm" -eq "02" ]; then
+                        num_check=$( /usr/bin/perl /home/dao_ops/bin/tick ${YEAR_TABLE}${DAY_TABLE[$mm-1]} )
                         check_num=$(echo $num_check | cut -c 7-8 )
                         echo $check_num
                         if [ $check_num -eq "29" ]; then
                                 DAY_TABLE=(31 29 31 30 31 30 31 31 30 31 30 31 )
                         fi
                 fi
-                SLURM_LOG_DIR=${CYLC_TASK_WORK_DIR}
-                echo "  - Submitting combine job for $satellite"
-                combine_job=$(sbatch --parsable \
-                    -J ${YEAR_TABLE}.${satellite}.combine \
-                    -o ${SLURM_LOG_DIR}/combine.log \
-                    --export=YEAR_TABLE=${YEAR_TABLE},INSTRUMENT_TABLE=${satellite} \
-                    --time=0:45:00 \
-                    --nodes=1 \
-                    --ntasks-per-node=1 \
-                    --cpus-per-task=1 \
-                    ${SCRIPT_DIR}/combine_sat_output.j)
-                echo "    - Combine job: $combine_job"
-            	echo "Waiting for jos: $combine_job"
-
-	        while squeue -j $combine_job >/dev/null 2>&1; do
-        		sleep 30
-		done
+                for SYNOP in 00 06 12 18 all; do
+                    echo "Combining synoptic time: $SYNOP for $YEAR_TABLE"
+                    # Execute the combine script with synoptic time as argument
+                    ${SCRIPT_DIR}/combine_sat_output.j $YEAR_TABLE $SYNOP  > ${CYLC_TASK_WORK_DIR}/${SYNOP}.log &
+                done
+                wait
                 """
         [[[job]]]
             batch system = slurm
-            execution time limit = PT1H
-            [[[directives]]]
-                --ntasks = 1
-                --cpus-per-task = 1
+            execution time limit = PT59M
+        [[[directives]]]
+            --nodes = 1
+            --partition = preops
+            --constraint = mil
